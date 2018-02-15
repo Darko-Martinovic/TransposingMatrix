@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TransposingMatrix", "TransposingMatrix\TransposingMatrix.sqlproj", "{01743100-4EBF-4F27-A8A6-AACBB022862C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01743100-4EBF-4F27-A8A6-AACBB022862C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FAE8DA3-9EE3-464B-8B88-CF52F5503A1D}
+	EndGlobalSection
+EndGlobal
