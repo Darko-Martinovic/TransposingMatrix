@@ -1,11 +1,17 @@
 ﻿----------------------------------------------------------
 --The first test
 ----------------------------------------------------------
-EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE';
-GO 
 EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases'
 GO
-EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='#tester'
+----------------------------------------------------------
+--save the result into permanent table
+----------------------------------------------------------
+EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE';
+GO 
+----------------------------------------------------------
+--save the result into temp table ( note two ## )
+----------------------------------------------------------
+EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='##tester'
 GO
 ----------------------------------------------------------
 --Test Phil's example
