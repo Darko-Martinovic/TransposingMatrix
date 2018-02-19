@@ -133,7 +133,7 @@ namespace TransposingMatrix
             }
             sqlsc += "DROP TABLE {0};" + "\n";
             sqlsc = string.Format(sqlsc, tableName);
-            sqlsc = "CREATE TABLE " + tableName + "(";
+            sqlsc += "CREATE TABLE " + tableName + "(";
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
@@ -181,7 +181,7 @@ namespace TransposingMatrix
             sqlsc += "DROP TYPE MATRIX.TVP_{0};" + "\n";
 
             sqlsc = string.Format(sqlsc, tableName);
-            sqlsc = "CREATE TYPE TVP_" + tableName + " AS TABLE (";
+            sqlsc += "CREATE TYPE TVP_" + tableName + " AS TABLE (";
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
