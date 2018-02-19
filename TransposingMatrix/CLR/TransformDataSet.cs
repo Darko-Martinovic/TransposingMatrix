@@ -5,23 +5,9 @@ using Microsoft.SqlServer.Server;
 
 namespace TransposingMatrix
 {
-    public static class DataSetUtilities
+    public static class PipeUtilities
     {
-
-        public static void PipeDataSet(DataSet ds)
-        {
-            if (ds == null)
-            {
-                throw new ArgumentException("PipeDataSet requires a non-null data set.");
-            }
-            else
-            {
-                foreach (DataTable dt in ds.Tables)
-                {
-                    PipeDataTable(dt);
-                }
-            }
-        }
+    
 
 
         public static void PipeDataTable(DataTable dt)

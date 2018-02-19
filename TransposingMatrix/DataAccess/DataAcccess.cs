@@ -118,6 +118,30 @@ namespace TransposingMatrix
             return ds;
         }
 
+        public static bool GetNonQuery(string CommandText)
+        {
+            bool retValue = true;
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection("context connection=true"))
+                {
+                    using (SqlCommand command = new SqlCommand(CommandText, cnn))
+                    {
+                        cnn.Open();
+                        command.ExecuteNonQuery();
+                        cnn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                retValue = false;
+                throw new Exception(ex.Message);
+            }
+            return retValue;
+        }
+
+
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/ms131092.aspx
         /// </summary>

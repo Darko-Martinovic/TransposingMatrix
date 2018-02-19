@@ -19,7 +19,8 @@ public partial class StoredProcedures
         [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString Params,
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 Rco, //rotate column ordinal
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 KeyValueOption, //do we use key value option
-        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString ColumnMapping//columns mappings
+        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString ColumnMapping, //columns mappings
+        [SqlFacet(IsNullable = true, MaxSize = 256)]SqlString TableName //temp table name
 
         )
     {
@@ -70,11 +71,24 @@ public partial class StoredProcedures
                     }
                 
                 }
+                DataTable tblRt = null;
                 if (KeyValueOption.Value == 0)
-                    DataSetUtilities.PipeDataTable(TableManipulation.RotateTable(tblCopy));
+                {
+                     tblRt= TableManipulation.RotateTable(tblCopy);
+                }
                 else
-                    DataSetUtilities.PipeDataTable(TableManipulation.RotateTableWithKeyValue(tblCopy, ColumnMapping.IsNull ? null : ColumnMapping.Value));
+                {
+                    tblRt = TableManipulation.RotateTableWithKeyValue(tblCopy, ColumnMapping.IsNull ? null : ColumnMapping.Value);
+                }
+                if (TableName.IsNull == false)
+                {
+                    string cmdToExecute = TableManipulation.CreateTABLE(TableName.Value, tblRt);
+                    DataAccess.GetResult(cmdToExecute);
+                }
+                PipeUtilities.PipeDataTable(tblRt);
+
             }
+
         }
         catch (Exception ex)
         {
