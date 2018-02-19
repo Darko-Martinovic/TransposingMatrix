@@ -112,6 +112,16 @@ namespace TransposingMatrix
         public static string CreateTABLE(string tableName, DataTable table)
         {
             string sqlsc;
+            if ( tableName.StartsWith("#") == false)
+            {
+                sqlsc = "IF OBJECT_ID('{0}', 'U') IS NOT NULL" + "\n";
+            }
+            else
+            {
+                sqlsc = "IF OBJECT_ID('tempdbo.dbo.{0}', 'U') IS NOT NULL" + "\n";
+            }
+            sqlsc += "DROP TABLE {0};" + "\n";
+            sqlsc = string.Format(sqlsc, tableName);
             sqlsc = "CREATE TABLE " + tableName + "(";
             for (int i = 0; i < table.Columns.Count; i++)
             {

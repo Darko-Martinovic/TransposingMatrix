@@ -15,7 +15,8 @@ ALTER PROCEDURE [dbo].[Transposing]
 	@Params [nvarchar](4000)=NULL,
 	@Rco [smallint]=1,
 	@KeyValueOption [smallint]=0,
-     @ColumnMapping [nvarchar](4000) = NULL
+     @ColumnMapping [nvarchar](4000) = NULL,
+	@TableName sysname = NULL
 AS EXTERNAL NAME [SimpleTalk.SQLCLR.Matrix].[StoredProcedures].[Transposing];
 GO
 

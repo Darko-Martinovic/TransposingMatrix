@@ -83,7 +83,8 @@ public partial class StoredProcedures
                 if (TableName.IsNull == false)
                 {
                     string cmdToExecute = TableManipulation.CreateTABLE(TableName.Value, tblRt);
-                    DataAccess.GetResult(cmdToExecute);
+                    DataAccess.GetNonQuery(cmdToExecute);
+
                 }
                 PipeUtilities.PipeDataTable(tblRt);
 
