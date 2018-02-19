@@ -142,6 +142,38 @@ namespace TransposingMatrix
         }
 
 
+        public static bool SaveResult(string TblName, DataTable dt)
+        {
+            bool retValue = true;
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection("context connection=true"))
+                {
+                    string colNames = TableManipulation.GetTableColumns(dt);
+                    string cmdText = "INSERT INTO " + TblName + " (" + colNames + ")" + "\n";
+                    cmdText += " SELECT " + colNames + " FROM @tvpTable ";
+
+                    using (SqlCommand command = new SqlCommand(cmdText, cnn))
+                    {
+                        cnn.Open();
+                        command.Parameters.AddWithValue("@tvpTable", dt);
+                        command.Parameters[command.Parameters.Count - 1].TypeName = "MATRIX.TVP_" + TblName;
+                        command.Parameters[command.Parameters.Count - 1].SqlDbType = SqlDbType.Structured;
+                        command.ExecuteNonQuery();
+                        cnn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                retValue = false;
+                throw new Exception(ex.Message);
+            }
+            return retValue;
+        }
+
+
+
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/ms131092.aspx
         /// </summary>

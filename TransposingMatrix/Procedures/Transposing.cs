@@ -83,8 +83,12 @@ public partial class StoredProcedures
                 if (TableName.IsNull == false)
                 {
                     string cmdToExecute = TableManipulation.CreateTABLE(TableName.Value, tblRt);
+                    cmdToExecute += ";\n" +  TableManipulation.CreateTYPE(TableName.Value, tblRt);
                     DataAccess.GetNonQuery(cmdToExecute);
 
+                    DataAccess.SaveResult(TableName.Value, tblRt);
+
+                    DataAccess.GetNonQuery("DROP TYPE MATRIX.TVP_" + TableName.Value);
                 }
                 PipeUtilities.PipeDataTable(tblRt);
 
@@ -99,6 +103,8 @@ public partial class StoredProcedures
         finally
         {
             ds = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
 
