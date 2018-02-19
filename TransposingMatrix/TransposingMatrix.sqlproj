@@ -92,6 +92,7 @@
     <None Include="Test\Test.sql" />
     <None Include="askTransposingMatrix.snk" />
     <None Include="Setup\Setup.sql" />
+    <None Include="Setup\CleanUp.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Database\PreDeployment.sql" />
