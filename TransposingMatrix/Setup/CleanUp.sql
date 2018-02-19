@@ -4,7 +4,7 @@ IF EXISTS
     SELECT *
     FROM sys.objects
     WHERE object_id = OBJECT_ID(N'[MATRIX].[Transposing]')
-          AND type = 'P'
+          AND type = 'PC'
 )
     BEGIN
         DROP PROCEDURE [MATRIX].[Transposing];
