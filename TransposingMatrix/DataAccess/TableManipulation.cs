@@ -129,7 +129,7 @@ namespace TransposingMatrix
             }
             else
             {
-                sqlsc = "IF OBJECT_ID('tempdbo.dbo.{0}', 'U') IS NOT NULL" + "\n";
+                sqlsc = "IF OBJECT_ID('tempdb.dbo.{0}', 'U') IS NOT NULL" + "\n";
             }
             sqlsc += "DROP TABLE {0};" + "\n";
             sqlsc = string.Format(sqlsc, tableName);
@@ -177,11 +177,11 @@ namespace TransposingMatrix
         {
             string sqlsc;
             sqlsc = "IF EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id" +  "\n";
-            sqlsc += "WHERE st.name = N'TVP_'" + tableName + " AND ss.name = N'MATRIX')" + "\n";
+            sqlsc += "WHERE st.name = N'TVP_" + tableName + "' AND ss.name = N'MATRIX')" + "\n";
             sqlsc += "DROP TYPE MATRIX.TVP_{0};" + "\n";
 
             sqlsc = string.Format(sqlsc, tableName);
-            sqlsc += "CREATE TYPE TVP_" + tableName + " AS TABLE (";
+            sqlsc += "CREATE TYPE MATRIX.TVP_" + tableName + " AS TABLE (";
             for (int i = 0; i < table.Columns.Count; i++)
             {
                 sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";

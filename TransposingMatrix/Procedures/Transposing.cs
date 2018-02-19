@@ -82,13 +82,16 @@ public partial class StoredProcedures
                 }
                 if (TableName.IsNull == false)
                 {
+                    string[] fullName = TableName.Value.Split('.');
+                    string partialTableName = fullName[fullName.Length - 1];
+
                     string cmdToExecute = TableManipulation.CreateTABLE(TableName.Value, tblRt);
-                    cmdToExecute += ";\n" +  TableManipulation.CreateTYPE(TableName.Value, tblRt);
+                    cmdToExecute += ";\n" +  TableManipulation.CreateTYPE(partialTableName, tblRt);
                     DataAccess.GetNonQuery(cmdToExecute);
 
                     DataAccess.SaveResult(TableName.Value, tblRt);
 
-                    DataAccess.GetNonQuery("DROP TYPE MATRIX.TVP_" + TableName.Value);
+                    DataAccess.GetNonQuery("DROP TYPE MATRIX.TVP_" + partialTableName);
                 }
                 PipeUtilities.PipeDataTable(tblRt);
 

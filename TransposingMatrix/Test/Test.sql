@@ -1,6 +1,7 @@
 ﻿----------------------------------------------------------
 --The first test
 ----------------------------------------------------------
+EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE'
 EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='#tester'
 
 ----------------------------------------------------------

@@ -147,6 +147,10 @@ namespace TransposingMatrix
             bool retValue = true;
             try
             {
+
+                string[] fullName = TblName.Split('.');
+                string partialTableName = fullName[fullName.Length - 1];
+
                 using (SqlConnection cnn = new SqlConnection("context connection=true"))
                 {
                     string colNames = TableManipulation.GetTableColumns(dt);
@@ -157,7 +161,7 @@ namespace TransposingMatrix
                     {
                         cnn.Open();
                         command.Parameters.AddWithValue("@tvpTable", dt);
-                        command.Parameters[command.Parameters.Count - 1].TypeName = "MATRIX.TVP_" + TblName;
+                        command.Parameters[command.Parameters.Count - 1].TypeName = "MATRIX.TVP_" + partialTableName;
                         command.Parameters[command.Parameters.Count - 1].SqlDbType = SqlDbType.Structured;
                         command.ExecuteNonQuery();
                         cnn.Close();
