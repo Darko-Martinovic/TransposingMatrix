@@ -88,7 +88,7 @@ public partial class StoredProcedures
 
                     DataAccess.SaveResult(TableName.Value, tblRt);
 
-                    DataAccess.GetNonQuery("DROP TYPE MATRIX.TVP_" + TableName.Value.Replace("#",""));
+                    DataAccess.GetNonQuery("DROP TYPE MATRIX.TVP_" + TableName.Value);
                 }
                 PipeUtilities.PipeDataTable(tblRt);
 

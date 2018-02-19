@@ -177,7 +177,7 @@ namespace TransposingMatrix
         {
             string sqlsc;
             sqlsc = "IF EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id" +  "\n";
-            sqlsc += "WHERE st.name = N'TVP_'" + tableName.Replace("#","") + " AND ss.name = N'MATRIX')" + "\n";
+            sqlsc += "WHERE st.name = N'TVP_'" + tableName + " AND ss.name = N'MATRIX')" + "\n";
             sqlsc += "DROP TYPE MATRIX.TVP_{0};" + "\n";
 
             sqlsc = string.Format(sqlsc, tableName);
@@ -215,7 +215,7 @@ namespace TransposingMatrix
                     sqlsc += " NOT NULL ";
                 sqlsc += ",";
             }
-            return sqlsc.Substring(0, sqlsc.Length - 1) + ") \n)";
+            return sqlsc.Substring(0, sqlsc.Length - 1) + "\n)";
         }
 
 
