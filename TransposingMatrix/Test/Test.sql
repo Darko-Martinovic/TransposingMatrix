@@ -32,33 +32,9 @@ EXEC [MATRIX].[Transposing] @Query = 'SELECT
 			 ,@columnMapping = N'[Year],[Total North America],[Total S. & Cent. America],[Total Europe & Eurasia],[Total Middle East],[Total Africa],[Total Asia Pacific]';
 
 ----------------------------------------------------
---Test Adam's sp_whoisactive
+--Test Sp_who
 ----------------------------------------------------
-EXEC [MATRIX].[Transposing] @Query = 'EXEC sp_whoisactive';
-
-
-----------------------------------------------------
---Transfer the result into temporary table
-----------------------------------------------------
---sp_configure 'Show Advanced Options', 1
---GO
---RECONFIGURE
---GO
---sp_configure 'Ad Hoc Distributed Queries', 1
---GO
---RECONFIGURE
---GO
-
---SELECT
---    * INTO #MyTempTable
---FROM OPENROWSET('SQLNCLI', 'Server=darko;Trusted_Connection=yes;',
---'EXEC AdventureWorks2014.[MATRIX].[Transposing] @Query = ''EXEC sp_whoisactive''
---WITH RESULT SETS ((test        sysname,test2 sysname ))
---')
-
---SELECT
---    *
---FROM #MyTempTable
+EXEC [MATRIX].[Transposing] @Query = 'EXEC sp_who';
 
 
 ----------------------------------------------------------
