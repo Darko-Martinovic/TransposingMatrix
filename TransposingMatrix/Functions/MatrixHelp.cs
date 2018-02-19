@@ -47,6 +47,8 @@ namespace TransposingMatrix
 
                 data.Add("@ColumnMapping", "Columns mappings.Default is null.");
 
+                data.Add("@TableName", "If you like to save result into temporary or permanent table");
+
 
             }
             else
