@@ -74,7 +74,7 @@ public partial class StoredProcedures
                 DataTable tblRt = null;
                 if (KeyValueOption.Value == 0)
                 {
-                     tblRt= TableManipulation.RotateTable(tblCopy);
+                     tblRt= TableManipulation.RotateTable(tblCopy,Rco.Value);
                 }
                 else
                 {

@@ -13,7 +13,7 @@ Post-Deployment Script Template
 ALTER PROCEDURE [dbo].[Transposing]
 	@Query [nvarchar](max),
 	@Params [nvarchar](4000)=NULL,
-	@Rco [smallint]=1,
+	@Rco [smallint]=0,
 	@KeyValueOption [smallint]=0,
      @ColumnMapping [nvarchar](4000) = NULL,
 	@TableName [nvarchar](256) = NULL
