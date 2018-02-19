@@ -1,9 +1,12 @@
 ﻿----------------------------------------------------------
 --The first test
 ----------------------------------------------------------
-EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE'
+EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE';
+GO 
+EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases'
+GO
 EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='#tester'
-
+GO
 ----------------------------------------------------------
 --Test Phil's example
 ----------------------------------------------------------
