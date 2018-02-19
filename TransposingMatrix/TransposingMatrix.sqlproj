@@ -84,7 +84,7 @@
   <ItemGroup>
     <Compile Include="Procedures\Transposing.cs" />
     <Compile Include="DataAccess\DataAcccess.cs" />
-    <Compile Include="CLR\TransformDataSet.cs" />
+    <Compile Include="CLR\PipeUtilities.cs" />
     <Compile Include="DataAccess\TableManipulation.cs" />
     <Compile Include="Functions\MatrixHelp.cs" />
   </ItemGroup>
