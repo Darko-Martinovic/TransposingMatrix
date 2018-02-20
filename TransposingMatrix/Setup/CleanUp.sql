@@ -47,7 +47,7 @@ IF
     SELECT COUNT(*)
     FROM master.sys.asymmetric_keys
     WHERE name = 'askTransposingMatrix'
-) = 0
+) > 0
             BEGIN
                 EXEC sp_executesql
 N'USE MASTER;
