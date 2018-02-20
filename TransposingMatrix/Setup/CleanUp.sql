@@ -39,3 +39,30 @@ IF EXISTS
         DROP ASSEMBLY [SimpleTalk.SQLCLR.Matrix];
 END;
 GO
+IF SERVERPROPERTY('productversion') >= '14'
+    BEGIN
+
+IF
+(
+    SELECT COUNT(*)
+    FROM master.sys.asymmetric_keys
+    WHERE name = 'askTransposingMatrix'
+) = 0
+            BEGIN
+                EXEC sp_executesql
+N'USE MASTER;
+DROP ASYMMETRIC KEY [askTransposingMatrix]';
+            END;
+        IF EXISTS
+(
+    SELECT loginname
+    FROM master.dbo.syslogins
+    WHERE name = 'loginTransposingMatrix'
+)
+            BEGIN
+                DECLARE @sqlStatement AS NVARCHAR(1000);
+                SELECT @SqlStatement = 'DROP LOGIN [loginTransposingMatrix]';
+                EXEC sp_executesql
+                     @SqlStatement;
+            END;
+END
