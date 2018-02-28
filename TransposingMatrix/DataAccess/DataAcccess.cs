@@ -10,55 +10,7 @@ namespace TransposingMatrix
 {
     class DataAccess
     {
-        public readonly List<object[]> data = new List<object[]>();
-        public int rowCount = 0;
-        public int fieldCount = 0;
-        public List<object[]> GetData(string Query, bool isSp, SqlParameter[] listOfParams, ref string html)
-        {
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection("context connection=true"))
-                {
-                    using (SqlCommand command = new SqlCommand(Query, cnn))
-                    {
-                        command.Parameters.Clear();
-                        cnn.Open();
-                        if (isSp)
-                            command.CommandType = CommandType.StoredProcedure;
-                        if (listOfParams != null)
-                        {
-                            foreach (SqlParameter p in listOfParams)
-                                command.Parameters.Add(p);
-                        }
-                        SqlDataReader dr = command.ExecuteReader();
-
-                        fieldCount = dr.FieldCount;
-                        object[] o = new object[fieldCount];
-                        for (int i = 0; i < fieldCount; i++)
-                            o[i] = dr.GetName(i);
-
-                        data.Add(o);
-                        rowCount++;
-
-                        while (dr.Read())
-                        {
-                            object[] o1 = new object[fieldCount];
-                            dr.GetValues(o1);
-                            data.Add(o1);
-                            rowCount++;
-                        }
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                html += ex.Message;
-            }
-            return data;
-        }
-
-
+       
 
         public static DataSet GetDataSet(string Query, bool isSp, SqlParameter[] listOfParams, ref string errorText)
         {
