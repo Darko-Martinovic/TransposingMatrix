@@ -24,3 +24,8 @@ EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 1;
 
 
+## To filter before transposing
+
+EXEC MATRIX.Transposing
+     @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
+     @Params = N'@id1 int=1,@Id2 int=4';
