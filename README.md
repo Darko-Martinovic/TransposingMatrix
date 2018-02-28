@@ -29,3 +29,10 @@ EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 EXEC MATRIX.Transposing
      @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
      @Params = N'@id1 int=1,@Id2 int=4';
+
+## To transpose with generic header ( key, value, value1 and so on )
+
+EXEC MATRIX.Transposing
+     @Query = N'SELECT * FROM sys.databases;',
+     @KeyValueOption = 1;
+
