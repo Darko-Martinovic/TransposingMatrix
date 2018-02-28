@@ -1,8 +1,10 @@
 ## To transpose query results
+
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
 
 ## To save transposing query results in a temporary or permanent table.
+
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM sys.databases',
      @tableName = N'##tempTable';
@@ -13,6 +15,7 @@ SELECT *
 FROM ##tempTable;
 
 ## To choose transposing column
+
 --The first column - name
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
@@ -35,4 +38,11 @@ EXEC MATRIX.Transposing
 EXEC MATRIX.Transposing
      @Query = N'SELECT * FROM sys.databases;',
      @KeyValueOption = 1;
+
+
+##To transpose with custom header
+
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
+					  ,@KeyValueOption = 1
+					  ,@ColumnMapping = N'Database name,Sys database master'
 
