@@ -6,7 +6,9 @@ EXEC MATRIX.TRANSPOSING
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM sys.databases',
      @tableName = N'##tempTable';
+     
 ---The same result as in the first query
+
 SELECT *
 FROM ##tempTable;
 
