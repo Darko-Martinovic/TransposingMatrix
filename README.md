@@ -40,7 +40,7 @@ EXEC MATRIX.Transposing
      @KeyValueOption = 1;
 
 
-##To transpose with custom header
+## To transpose with custom header
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
 					  ,@KeyValueOption = 1
