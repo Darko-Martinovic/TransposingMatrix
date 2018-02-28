@@ -87,6 +87,7 @@
     <Compile Include="CLR\PipeUtilities.cs" />
     <Compile Include="DataAccess\TableManipulation.cs" />
     <Compile Include="Functions\MatrixHelp.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Test\Test.sql" />
