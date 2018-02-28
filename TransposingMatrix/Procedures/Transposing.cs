@@ -25,6 +25,7 @@ public partial class StoredProcedures
         )
     {
         DataSet ds = null;
+        string errorString = "";
         try
         {
             bool mySp = false;
@@ -32,7 +33,7 @@ public partial class StoredProcedures
             SqlParameter[] listOfParams = null;
             string[] splitQueries = queryValue.Split(';');
 
-            string errorString = "";
+
             if (Params.IsNull == false && Params.Value.ToString().Equals(string.Empty) == false)
                 listOfParams = DataAccess.MakeParams(Params.Value, ref errorString);
 
@@ -100,8 +101,12 @@ public partial class StoredProcedures
         }
         catch (Exception ex)
         {
-           SqlContext.Pipe.Send("There is an error in transposing matrix : " + ex.Message + "\r\n" + ex.InnerException == null ? "" : ex.InnerException.Message);
-    
+            errorString = ex.Message;
+            if (ex.InnerException != null)
+                errorString += "\r\n" + ex.InnerException.Message;
+            SqlContext.Pipe.Send("There is an error in the stored procedure : " + errorString);
+            
+
         }
         finally
         {
