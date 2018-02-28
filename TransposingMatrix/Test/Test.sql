@@ -1,17 +1,29 @@
 ﻿----------------------------------------------------------
---The first test
+--To transpose query results
 ----------------------------------------------------------
 EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases'
 GO
 ----------------------------------------------------------
---save the result into permanent table
+--To save transposing query results in a temporary or permanent table.
 ----------------------------------------------------------
 EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='MATRIX.TEMPTABLE';
 GO 
 ----------------------------------------------------------
---save the result into temp table ( note two ## )
+--To save the result into a temporary table ( note two ## )
 ----------------------------------------------------------
-EXEC MATRIX.TRANSPOSING @query='SELECT * FROM sys.databases',@tablename ='##tester'
+EXEC MATRIX.TRANSPOSING @query = 'SELECT * FROM sys.databases', @tableName = N'##tempTable';
+GO
+---The same result as in the first query
+SELECT * FROM ##tempTable;
+GO
+----------------------------------------------------------
+--To choose transposing column
+----------------------------------------------------------
+--The first column - name
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases' ,@Rco = 0;
+GO
+--The second column - database_id
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases' ,@Rco = 1;
 GO
 ----------------------------------------------------------
 --Test Phil's example
@@ -26,16 +38,20 @@ EXEC [MATRIX].[Transposing] @Query = 'SELECT
   (2917, 2928, 3063, 3236, 3315, 3486, 3413, 3579, 3678, 3763, 3888),
   (24569, 25157, 26035, 25900, 26244, 27954, 28893, 30001, 30588, 31119, 32444)
   ) oilConsumption ([2005], [2006], [2007], [2008], [2009], [2010], [2011], [2012], [2013], [2014], [2015])'
-			 ,@params = NULL
 			 ,@rco = 1
 			 ,@keyvalueoption = 1
 			 ,@columnMapping = N'[Year],[Total North America],[Total S. & Cent. America],[Total Europe & Eurasia],[Total Middle East],[Total Africa],[Total Asia Pacific]';
-
+GO
+----------------------------------------------------
+--To filter before transposing
+----------------------------------------------------
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;', @Params = N'@id1 int=1,@Id2 int=4';
+GO
 ----------------------------------------------------
 --Test Sp_who
 ----------------------------------------------------
 EXEC [MATRIX].[Transposing] @Query = 'EXEC sp_who';
-
+GO
 
 ----------------------------------------------------------
 -- Column mapping is null 
@@ -52,3 +68,9 @@ EXEC MATRIX.Transposing @Query = 'SELECT
   ) oilConsumption ([2005], [2006], [2007], [2008], [2009], [2010], [2011], [2012], [2013], [2014], [2015])'
 
 			 ,@keyvalueoption = 1
+GO
+----------------------------------------------------------
+--To transpose with custom header
+----------------------------------------------------------
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;' ,@KeyValueOption = 1 ,@ColumnMapping = N'Database name,Sys database master'
+GO
