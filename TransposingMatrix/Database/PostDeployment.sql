@@ -19,7 +19,9 @@ ALTER PROCEDURE [dbo].[Transposing]
 	@TableName [nvarchar](256) = NULL
 AS EXTERNAL NAME [SimpleTalk.SQLCLR.Matrix].[StoredProcedures].[Transposing];
 GO
-
+-------------------------------------------------------------------------
+--Transfer the stored procedure
+-------------------------------------------------------------------------
 IF EXISTS ( SELECT * 
             FROM   sysobjects 
             WHERE  id = object_id(N'[MATRIX].[Transposing]') 
@@ -30,8 +32,9 @@ END
 
 ALTER SCHEMA [MATRIX] TRANSFER [dbo].[Transposing];
 
-
---Transfer function
+-------------------------------------------------------------------------
+--Transfer the function
+-------------------------------------------------------------------------
 IF EXISTS ( SELECT * 
 			FROM   sysobjects 
 			WHERE  id = object_id(N'[MATRIX].[Help]') 
