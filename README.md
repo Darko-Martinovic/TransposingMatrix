@@ -1,4 +1,3 @@
-
 ## To transpose query results
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
@@ -18,6 +17,7 @@ FROM ##tempTable;
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 0;
+				   
 --The second column - database_id
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
