@@ -17,7 +17,8 @@ END;
 ---------------------------------------------------------------------------------------
 --- Only for SQL Server 2017+
 -----------------------------------------------
-IF SERVERPROPERTY('productversion') >= '14'
+IF SERVERPROPERTY('productversion') >= '14' AND 
+    SUBSTRING(CAST(SERVERPROPERTY('productversion') as nvarchar(10)),1,1) != '9'
     BEGIN
 --------------------------------------------------------------------------------------
 --Create asymetric key 

@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
-using System.Diagnostics;
 using Microsoft.SqlServer.Server;
 using TransposingMatrix;
 
@@ -15,7 +13,7 @@ public partial class StoredProcedures
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void Transposing
         (
-        SqlString Query, //query we passed
+        SqlString Query,                                                     // the query or the stored procedure name. If we pass the stored procedure
         [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString Params,
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 Rco, //rotate column ordinal
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 KeyValueOption, //do we use key value option
