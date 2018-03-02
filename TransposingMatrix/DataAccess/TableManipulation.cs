@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace TransposingMatrix
 {
@@ -110,113 +107,7 @@ namespace TransposingMatrix
         }
 
 
-        public static string GetTableColumns(DataTable table)
-        {
-            string sqlsc =null;
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                sqlsc += "\n [" + table.Columns[i].ColumnName + "],";
-            }
-            return sqlsc.Substring(0, sqlsc.Length - 1) + "\n";
 
-        }
-        public static string CreateTABLE(string tableName, DataTable table)
-        {
-            string sqlsc;
-            if (tableName.StartsWith("#") == false)
-            {
-                sqlsc = "IF OBJECT_ID('{0}', 'U') IS NOT NULL" + "\n";
-            }
-            else
-            {
-                sqlsc = "IF OBJECT_ID('tempdb.dbo.{0}', 'U') IS NOT NULL" + "\n";
-            }
-            sqlsc += "DROP TABLE {0};" + "\n";
-            sqlsc = string.Format(sqlsc, tableName);
-            sqlsc += "CREATE TABLE " + tableName + "(";
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
-                string columnType = table.Columns[i].DataType.ToString();
-                switch (columnType)
-                {
-                    case "System.Int32":
-                        sqlsc += " int ";
-                        break;
-                    case "System.Int64":
-                        sqlsc += " bigint ";
-                        break;
-                    case "System.Int16":
-                        sqlsc += " smallint";
-                        break;
-                    case "System.Byte":
-                        sqlsc += " tinyint";
-                        break;
-                    case "System.Decimal":
-                        sqlsc += " decimal ";
-                        break;
-                    case "System.DateTime":
-                        sqlsc += " datetime ";
-                        break;
-                    case "System.String":
-                    default:
-                        sqlsc += string.Format(" nvarchar({0}) ", table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString());
-                        break;
-                }
-                if (table.Columns[i].AutoIncrement)
-                    sqlsc += " IDENTITY(" + table.Columns[i].AutoIncrementSeed.ToString() + "," + table.Columns[i].AutoIncrementStep.ToString() + ") ";
-                if (!table.Columns[i].AllowDBNull)
-                    sqlsc += " NOT NULL ";
-                sqlsc += ",";
-            }
-            return sqlsc.Substring(0, sqlsc.Length - 1) + "\n)";
-        }
-
-
-        public static string CreateTYPE(string tableName, DataTable table)
-        {
-            string sqlsc;
-            sqlsc = "IF EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id" +  "\n";
-            sqlsc += "WHERE st.name = N'TVP_" + tableName + "' AND ss.name = N'MATRIX')" + "\n";
-            sqlsc += "DROP TYPE MATRIX.TVP_{0};" + "\n";
-
-            sqlsc = string.Format(sqlsc, tableName);
-            sqlsc += "CREATE TYPE MATRIX.TVP_" + tableName + " AS TABLE (";
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
-                string columnType = table.Columns[i].DataType.ToString();
-                switch (columnType)
-                {
-                    case "System.Int32":
-                        sqlsc += " int ";
-                        break;
-                    case "System.Int64":
-                        sqlsc += " bigint ";
-                        break;
-                    case "System.Int16":
-                        sqlsc += " smallint";
-                        break;
-                    case "System.Byte":
-                        sqlsc += " tinyint";
-                        break;
-                    case "System.Decimal":
-                        sqlsc += " decimal ";
-                        break;
-                    case "System.DateTime":
-                        sqlsc += " datetime ";
-                        break;
-                    case "System.String":
-                    default:
-                        sqlsc += string.Format(" nvarchar({0}) ", table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString());
-                        break;
-                }
-                if (!table.Columns[i].AllowDBNull)
-                    sqlsc += " NOT NULL ";
-                sqlsc += ",";
-            }
-            return sqlsc.Substring(0, sqlsc.Length - 1) + "\n)";
-        }
 
 
     }

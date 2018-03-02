@@ -113,11 +113,11 @@ public partial class StoredProcedures
                     //
                     // First we build T-SQL to create the table 
                     //
-                    string cmdToExecute = TableManipulation.CreateTABLE(TableName.Value, tblRt);
+                    string cmdToExecute = DataAccess.CreateTABLE(TableName.Value, tblRt);
                     // 
                     // Then build T-SQL to create the table value type ( SQL 2008+ )
                     //
-                    cmdToExecute += ";\n" +  TableManipulation.CreateTYPE(partialTableName, tblRt);
+                    cmdToExecute += ";\n" +  DataAccess.CreateTYPE(partialTableName, tblRt);
 
                     DataAccess.ExecuteNonQuery(cmdToExecute);
 
