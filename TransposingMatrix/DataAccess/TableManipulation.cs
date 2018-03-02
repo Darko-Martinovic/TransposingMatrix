@@ -4,14 +4,22 @@ namespace TransposingMatrix
 {
     public static class TableManipulation
     {
+
+        /// <summary>
+        /// Transposing the result with custom or generic header
+        /// </summary>
+        /// <param name="oldTable">The datatable object to transform</param>
+        /// <param name="columnMapping">The custom header</param>
+        /// <returns></returns>
         public static DataTable RotateTableWithKeyValue(DataTable oldTable,string columnMapping)
         {
             DataTable newTable = new DataTable();
             DataRow dr = default(DataRow);
 
-
+            // The column mapping is not provided,so create the generic header
             if ( columnMapping == null )
             {
+                //the first column name is key
                 newTable.Columns.Add("Key");
                 int no = 0;
                 foreach (DataRow row in oldTable.Rows)
@@ -27,7 +35,7 @@ namespace TransposingMatrix
                 {
                     newTable.Columns.Add(s);
                 }
-
+                // if we do not pass "enough" names, fill the rest with generic names
                 if ( names.Length < oldTable.Rows.Count+1)
                 {
                     int no = names.Length;
@@ -60,6 +68,13 @@ namespace TransposingMatrix
             return newTable;
         }
 
+
+        /// <summary>
+        /// The classical approach. The rotation is made based on "pco" value
+        /// </summary>
+        /// <param name="oldTable"></param>
+        /// <param name="pco"></param>
+        /// <returns></returns>
         public static DataTable RotateTable(DataTable oldTable, int pco = 0)
         {
             DataTable newTable = new DataTable();
