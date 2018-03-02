@@ -1,4 +1,6 @@
-﻿--Drop the stored procedure
+﻿-------------------------------------------------------------------------
+--Drop the stored procedure
+-------------------------------------------------------------------------
 IF EXISTS
 (
     SELECT *
@@ -9,7 +11,9 @@ IF EXISTS
     BEGIN
         DROP PROCEDURE [MATRIX].[Transposing];
 END;
---Drop helper function 
+-------------------------------------------------------------------------
+--Drop the helper function 
+-------------------------------------------------------------------------
 IF EXISTS
 (
     SELECT *
@@ -18,7 +22,9 @@ IF EXISTS
           AND type IN(N'FN', N'IF', N'TF', N'FS', N'FT')
 )
     DROP FUNCTION [MATRIX].[Help];
---Drop schema
+-------------------------------------------------------------------------
+--Drop the schema
+-------------------------------------------------------------------------
 IF EXISTS
 (
     SELECT *
@@ -29,6 +35,9 @@ IF EXISTS
         EXEC ('DROP SCHEMA [MATRIX] ');
 END;
 GO
+-------------------------------------------------------------------------
+-- Drop the assembly 
+-------------------------------------------------------------------------
 IF EXISTS
 (
     SELECT *
@@ -39,6 +48,9 @@ IF EXISTS
         DROP ASSEMBLY [SimpleTalk.SQLCLR.Matrix];
 END;
 GO
+-------------------------------------------------------------------------
+-- Only for SQL Server 2017+
+-------------------------------------------------------------------------
 IF SERVERPROPERTY('productversion') >= '14'
     BEGIN
 
