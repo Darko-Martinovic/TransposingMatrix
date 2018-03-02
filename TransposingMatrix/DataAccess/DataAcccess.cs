@@ -9,13 +9,23 @@ namespace TransposingMatrix
 {
     class DataAccess
     {
-       
 
+        /// <summary>
+        /// The general routine to get the dataset object
+        /// </summary>
+        /// <param name="Query">T-SQL query or the stored procedure name</param>
+        /// <param name="isSp"></param>
+        /// <param name="listOfParams">The query or the stored procedure parameters</param>
+        /// <param name="errorText">If an error occurred, we captured the message</param>
+        /// <returns></returns>
         public static DataSet GetDataSet(string Query, bool isSp, SqlParameter[] listOfParams, ref string errorText)
         {
             DataSet ds = new DataSet();
             try
             {
+                //
+                // we must use "context connection=true" keyword
+                //
                 using (SqlConnection cnn = new SqlConnection("context connection=true"))
                 {
                     using (SqlCommand command = new SqlCommand(Query, cnn))
@@ -47,33 +57,20 @@ namespace TransposingMatrix
         }
 
 
-        public static string GetResult(string Query)
-        {
-            string ds = null;
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection("context connection=true"))
-                {
-                    using (SqlCommand command = new SqlCommand(Query, cnn))
-                    {
-                        cnn.Open();
-                        ds = command.ExecuteScalar().ToString();
-                        cnn.Close();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ds = ex.Message;
-            }
-            return ds;
-        }
-
+        /// <summary>
+        /// A wrapper around ExecuteNonQuery. It is used to create a permanent or a temporary table.
+        /// </summary>
+        /// <param name="CommandText">DDL command</param>
+        /// <returns></returns>
         public static bool ExecuteNonQuery(string CommandText)
         {
             bool retValue = true;
             try
             {
+
+                //
+                // we must use "context connection=true" keyword
+                //
                 using (SqlConnection cnn = new SqlConnection("context connection=true"))
                 {
                     using (SqlCommand command = new SqlCommand(CommandText, cnn))
@@ -93,6 +90,14 @@ namespace TransposingMatrix
         }
 
 
+        /// <summary>
+        /// It is used to save the result of transposing to the temporary or the permanent table.
+        /// I used mapping of the datatable object to SqlDbType.Structed parameter. 
+        /// The structed parameter = SQL Server table value type
+        /// </summary>
+        /// <param name="TblName">The temporary table name</param>
+        /// <param name="dt">The datatable object</param>
+        /// <returns></returns>
         public static bool SaveResult(string TblName, DataTable dt)
         {
             bool retValue = true;
@@ -213,6 +218,13 @@ namespace TransposingMatrix
             return retValue;
         }
 
+
+        /// <summary>
+        /// How I determine the parameter size
+        /// </summary>
+        /// <param name="size"></param>
+        /// <param name="scale"></param>
+        /// <returns></returns>
         public static int DeterminSize(string size, ref byte scale)
         {
             int retValue = 0;
@@ -234,7 +246,14 @@ namespace TransposingMatrix
             return retValue;
         }
 
-        public static SqlParameter[] MakeParams(string value, ref string html)
+
+        /// <summary>
+        /// That the way how to make parameters collection
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static SqlParameter[] MakeParams(string value, ref string errorText)
         {
             SqlParameter[] sp = null;
             try
@@ -260,7 +279,7 @@ namespace TransposingMatrix
                     if (valueSpliiter.Length > 1)
                     {
                         string tester = valueSpliiter[0].Substring(valueSpliiter[0].IndexOf(' '), valueSpliiter[0].Length - valueSpliiter[0].IndexOf(' '));
-                        s1.SqlDbType = DetermineSqlDbType(tester, ref html);
+                        s1.SqlDbType = DetermineSqlDbType(tester, ref errorText);
                         if (tester.Contains("("))
                         {
                             string pomValue = Regex.Replace(tester, " ", "", RegexOptions.IgnoreCase);
@@ -289,14 +308,18 @@ namespace TransposingMatrix
             catch (Exception ex)
             {
                 sp = null;
-                html += ex.Message;
+                errorText += ex.Message;
             }
             return sp;
 
         }
 
 
-
+        /// <summary>
+        /// That's the way how to determine parameter value
+        /// </summary>
+        /// <param name="valueSplitter"></param>
+        /// <param name="s1"></param>
         private static void DetermineValue(string valueSplitter, ref SqlParameter s1)
         {
             if (s1.SqlDbType == SqlDbType.Int)
@@ -383,6 +406,11 @@ namespace TransposingMatrix
 
         }
 
+        /// <summary>
+        /// That's the way how to build list of the table columns
+        /// </summary>
+        /// <param name="table">The datatable object</param>
+        /// <returns></returns>
         public static string GetTableColumns(DataTable table)
         {
             string sqlsc = null;
@@ -393,6 +421,13 @@ namespace TransposingMatrix
             return sqlsc.Substring(0, sqlsc.Length - 1) + "\n";
 
         }
+
+        /// <summary>
+        /// That's the way how to build DDL statement to create table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public static string CreateTABLE(string tableName, DataTable table)
         {
             string sqlsc;
@@ -444,6 +479,14 @@ namespace TransposingMatrix
             }
             return sqlsc.Substring(0, sqlsc.Length - 1) + "\n)";
         }
+
+
+        /// <summary>
+        /// That's the way how to build DDL statement to create table value type
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="table"></param>
+        /// <returns></returns>
         public static string CreateTYPE(string tableName, DataTable table)
         {
             string sqlsc;
