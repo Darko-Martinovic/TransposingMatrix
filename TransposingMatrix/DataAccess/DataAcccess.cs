@@ -70,7 +70,7 @@ namespace TransposingMatrix
             return ds;
         }
 
-        public static bool GetNonQuery(string CommandText)
+        public static bool ExecuteNonQuery(string CommandText)
         {
             bool retValue = true;
             try
