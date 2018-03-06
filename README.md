@@ -1,4 +1,4 @@
-## :white_check_mark: To transpose query results
+## :white_check_mark: To transpose query results :hr:
 
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
@@ -31,7 +31,7 @@ EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 
 EXEC MATRIX.Transposing
      @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
-     #@Params = N'@id1 int=1,@Id2 int=4'#;
+     @Params = N'@id1 int=1,@Id2 int=4';
 
 ## :white_check_mark: To transpose with generic header ( key, value, value1 and so on )
 
