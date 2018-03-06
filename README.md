@@ -3,7 +3,7 @@
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
 
-## To save transposing query results in a temporary or permanent table.
+## :white_check_mark: To save transposing query results in a temporary or permanent table.
 
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM sys.databases',
@@ -14,7 +14,7 @@ EXEC MATRIX.TRANSPOSING
 SELECT *
 FROM ##tempTable;
 
-## To choose transposing column
+## :white_check_mark: To choose transposing column
 
 --The first column - name
 
@@ -27,20 +27,20 @@ EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 1;
 
 
-## To filter before transposing
+## :white_check_mark: To filter before transposing
 
 EXEC MATRIX.Transposing
      @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
-     @Params = N'@id1 int=1,@Id2 int=4';
+     #@Params = N'@id1 int=1,@Id2 int=4'#;
 
-## To transpose with generic header ( key, value, value1 and so on )
+## :white_check_mark: To transpose with generic header ( key, value, value1 and so on )
 
 EXEC MATRIX.Transposing
      @Query = N'SELECT * FROM sys.databases;',
      @KeyValueOption = 1;
 
 
-## To transpose with custom header
+## :white_check_mark: To transpose with custom header
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
 					  ,@KeyValueOption = 1
