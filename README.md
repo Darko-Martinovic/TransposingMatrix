@@ -1,4 +1,4 @@
-## To transpose query results
+## :white_check_mark: To transpose query results
 
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
