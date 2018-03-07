@@ -10,7 +10,7 @@ EXEC MATRIX.TRANSPOSING
      @tableName = N'##tempTable';
      
 ```diff
----The same result as in the first query
++---The same result as in the first query
 ```
     
 
@@ -21,13 +21,13 @@ FROM ##tempTable;
 ## :white_check_mark: To choose transposing column
 
 ```diff
---The first column - name
++--The first column - name
 ```
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 0;
 ```diff				   
---The second column - database_id
++--The second column - database_id
 ```
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 1;
