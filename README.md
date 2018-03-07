@@ -9,14 +9,20 @@ EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM sys.databases',
      @tableName = N'##tempTable';
      
----The same result as in the first query
+```diff
++ ---The same result as in the first query
+```
+    
+
 
 SELECT *
 FROM ##tempTable;
 
 ## :white_check_mark: To choose transposing column
 
---The first column - name
+```diff
++--The first column - name
+```
 
 EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
 				   ,@Rco = 0;
