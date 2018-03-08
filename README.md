@@ -1,10 +1,12 @@
 ## :white_check_mark: To transpose query results 
 
+```diff
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
+```
 
 ## :white_check_mark: To save transposing query results in a temporary or permanent table.
-```diff
+
 +The table will be created inside the stored procedure, and after that, you have to drop the table manually. 
 +There is no need to create a temporary or a permanent table first. 
 +The whole task is accomplished inside the stored procedure. 
