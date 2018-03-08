@@ -11,9 +11,9 @@
 +The whole task is accomplished inside the stored procedure. 
 +The account that executes stored procedure has to have "CREATE TABLE permission."
 ```
-EXEC MATRIX.TRANSPOSING
-     @query = 'SELECT * FROM sys.databases',
-     @tableName = N'##tempTable';
+```diff
+-EXEC MATRIX.TRANSPOSING  @query = N'SELECT * FROM sys.databases', @tableName = N'##tempTable';
+```
      
 ```diff
 +---The same result as in the first query
