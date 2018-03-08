@@ -20,24 +20,24 @@
 ```
     
 
-
-SELECT *
-FROM ##tempTable;
+```diff
+-SELECT * FROM ##tempTable;
+```
 
 ## :white_check_mark: To choose transposing column
 
 ```diff
 +--The first column - name
 ```
-
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
-				   ,@Rco = 0;
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases' ,@Rco = 0;
+```
 ```diff				   
 +--The second column - database_id
 ```
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
-				   ,@Rco = 1;
-
+```diff
+EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases',@Rco = 1;
+```
 
 ## :white_check_mark: To filter before transposing
 
