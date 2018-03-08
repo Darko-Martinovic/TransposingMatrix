@@ -1,7 +1,7 @@
 ## :white_check_mark: To transpose query results 
 
 ```diff
-EXEC MATRIX.TRANSPOSING
+-EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM SYS.DATABASES';
 ```
 
