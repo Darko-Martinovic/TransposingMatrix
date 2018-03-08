@@ -5,7 +5,10 @@ EXEC MATRIX.TRANSPOSING
 
 ## :white_check_mark: To save transposing query results in a temporary or permanent table.
 ```diff
-+The table will be created inside the stored procedure, and after that, you have to drop the table manually. So, there is no need to create a temporary or a permanent table first. The whole task is accomplished inside the stored procedure. So, the account that executes stored procedure has to have "CREATE TABLE permission."
++The table will be created inside the stored procedure, and after that, you have to drop the table manually. 
++There is no need to create a temporary or a permanent table first. 
++The whole task is accomplished inside the stored procedure. 
++The account that executes stored procedure has to have "CREATE TABLE permission."
 ```
 EXEC MATRIX.TRANSPOSING
      @query = 'SELECT * FROM sys.databases',
