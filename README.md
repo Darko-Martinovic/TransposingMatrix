@@ -2,7 +2,7 @@
 
 ```diff
 -EXEC MATRIX.TRANSPOSING
-     @query = 'SELECT * FROM SYS.DATABASES';
+     -@query = 'SELECT * FROM SYS.DATABASES';
 ```
 
 ## :white_check_mark: To save transposing query results in a temporary or permanent table.
