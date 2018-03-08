@@ -1,8 +1,7 @@
 ## :white_check_mark: To transpose query results 
 
 ```diff
--EXEC MATRIX.TRANSPOSING
-     -@query = 'SELECT * FROM SYS.DATABASES';
+-EXEC MATRIX.TRANSPOSING @query = N'SELECT * FROM SYS.DATABASES';
 ```
 
 ## :white_check_mark: To save transposing query results in a temporary or permanent table.
