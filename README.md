@@ -27,13 +27,13 @@
 ## :white_check_mark: To choose transposing column
 
 ```diff
-+--The first column - name
++--The first column - the database name
 ```
 ```diff
 -EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases' ,@Rco = 0;
 ```
 ```diff				   
-+--The second column - database_id
++--The second column - the database ID
 ```
 ```diff
 -EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases',@Rco = 1;
@@ -46,15 +46,14 @@
 ```     
 
 ## :white_check_mark: To transpose with generic header ( key, value, value1 and so on )
-
-EXEC MATRIX.Transposing
-     @Query = N'SELECT * FROM sys.databases;',
-     @KeyValueOption = 1;
-
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;',@KeyValueOption = 1;
+```
 
 ## :white_check_mark: To transpose with custom header
-
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
-					  ,@KeyValueOption = 1
-					  ,@ColumnMapping = N'Database name,Sys database master'
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
+-					  ,@KeyValueOption = 1
+-					  ,@ColumnMapping = N'Database name,Sys database master'
+```					  
 
