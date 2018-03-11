@@ -1,48 +1,59 @@
-## To transpose query results
+## :white_check_mark: To transpose query results 
 
-EXEC MATRIX.TRANSPOSING
-     @query = 'SELECT * FROM SYS.DATABASES';
+```diff
+-EXEC MATRIX.TRANSPOSING @query = N'SELECT * FROM SYS.DATABASES';
+```
 
-## To save transposing query results in a temporary or permanent table.
-
-EXEC MATRIX.TRANSPOSING
-     @query = 'SELECT * FROM sys.databases',
-     @tableName = N'##tempTable';
+## :white_check_mark: To save transposing query results in a temporary or permanent table.
+```diff
++The table will be created inside the stored procedure, and after that, you have to drop the table manually. 
++There is no need to create a temporary or a permanent table first. 
++The whole task is accomplished inside the stored procedure. 
++The account that executes stored procedure has to have "CREATE TABLE permission."
+```
+```diff
+-EXEC MATRIX.TRANSPOSING  @query = N'SELECT * FROM sys.databases', @tableName = N'##tempTable';
+```
      
----The same result as in the first query
+```diff
++---The same result as in the first query
+```
+    
 
-SELECT *
-FROM ##tempTable;
+```diff
+-SELECT * FROM ##tempTable;
+```
 
-## To choose transposing column
+## :white_check_mark: To choose transposing column
 
---The first column - name
+```diff
++--The first column - the database name
+```
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases' ,@Rco = 0;
+```
+```diff				   
++--The second column - the database ID
+```
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases',@Rco = 1;
+```
 
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
-				   ,@Rco = 0;
-				   
---The second column - database_id
+## :white_check_mark: To filter before transposing
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
+-                        @Params = N'@id1 int=1,@Id2 int=4';
+```     
 
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases'
-				   ,@Rco = 1;
+## :white_check_mark: To transpose with generic header ( key, value, value1 and so on )
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;',@KeyValueOption = 1;
+```
 
-
-## To filter before transposing
-
-EXEC MATRIX.Transposing
-     @Query = N'SELECT * FROM sys.databases WHERE database_id >= @id1 AND database_id <= @id2;',
-     @Params = N'@id1 int=1,@Id2 int=4';
-
-## To transpose with generic header ( key, value, value1 and so on )
-
-EXEC MATRIX.Transposing
-     @Query = N'SELECT * FROM sys.databases;',
-     @KeyValueOption = 1;
-
-
-## To transpose with custom header
-
-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
-					  ,@KeyValueOption = 1
-					  ,@ColumnMapping = N'Database name,Sys database master'
+## :white_check_mark: To transpose with custom header
+```diff
+-EXEC MATRIX.Transposing @Query = N'SELECT * FROM sys.databases;'
+-					  ,@KeyValueOption = 1
+-					  ,@ColumnMapping = N'Database name,Sys database master'
+```					  
 
