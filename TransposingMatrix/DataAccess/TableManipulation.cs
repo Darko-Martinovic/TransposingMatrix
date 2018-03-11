@@ -68,6 +68,8 @@ namespace TransposingMatrix
                     }
                     if (oldTable.Rows[row][col].ToString().Equals("System.Byte[]"))
                         dr[row + 1] = ByteArrayToString((byte[])oldTable.Rows[row][col]);
+                    else if (oldTable.Columns[col].DataType.ToString().Equals("System.DateTime"))
+                        dr[row + 1] = Convert.ToDateTime(oldTable.Rows[row][col]).ToString("yyyy-MM-dd HH:mm:ss.fff");
                     else
                         dr[row + 1] = oldTable.Rows[row][col];
                 }
@@ -129,6 +131,8 @@ namespace TransposingMatrix
                     }
                     if (oldTable.Rows[row][col].ToString().Equals("System.Byte[]"))
                         dr[row + 1] = ByteArrayToString((byte[])oldTable.Rows[row][col]);
+                    else if (oldTable.Columns[col].DataType.ToString().Equals("System.DateTime"))
+                        dr[row + 1] = Convert.ToDateTime(oldTable.Rows[row][col]).ToString("yyyy-MM-dd HH:mm:ss.fff");
                     else
                         dr[row + 1] = oldTable.Rows[row][col];
                 }
