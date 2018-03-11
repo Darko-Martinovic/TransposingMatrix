@@ -61,6 +61,11 @@ namespace TransposingMatrix
 
                 for (int row = 0; row <= oldTable.Rows.Count - 1; row++)
                 {
+                    if (StringExtensions.IsNullOrWhiteSpace(oldTable.Rows[row][col].ToString()))
+                    {
+                        dr[row + 1] = DBNull.Value;
+                        continue;
+                    }
                     if (oldTable.Rows[row][col].ToString().Equals("System.Byte[]"))
                         dr[row + 1] = ByteArrayToString((byte[])oldTable.Rows[row][col]);
                     else
@@ -119,7 +124,7 @@ namespace TransposingMatrix
 
                     if ( StringExtensions.IsNullOrWhiteSpace(oldTable.Rows[row][col].ToString()))
                     {
-                        dr[row + 1] = System.DBNull.Value;
+                        dr[row + 1] =DBNull.Value;
                         continue;
                     }
                     if (oldTable.Rows[row][col].ToString().Equals("System.Byte[]"))
