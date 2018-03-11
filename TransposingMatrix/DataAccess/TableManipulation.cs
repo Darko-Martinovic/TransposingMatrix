@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Text;
 
@@ -72,7 +73,7 @@ namespace TransposingMatrix
             return newTable;
         }
 
-
+       
         /// <summary>
         /// The classical approach. The rotation is made based on "pco" value
         /// </summary>
@@ -115,6 +116,12 @@ namespace TransposingMatrix
 
                 for (int row = 0; row <= oldTable.Rows.Count - 1; row++)
                 {
+
+                    if ( StringExtensions.IsNullOrWhiteSpace(oldTable.Rows[row][col].ToString()))
+                    {
+                        dr[row + 1] = System.DBNull.Value;
+                        continue;
+                    }
                     if (oldTable.Rows[row][col].ToString().Equals("System.Byte[]"))
                         dr[row + 1] = ByteArrayToString((byte[])oldTable.Rows[row][col]);
                     else

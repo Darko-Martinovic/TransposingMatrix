@@ -33,10 +33,12 @@ namespace TransposingMatrix
                     for (int i = 0; i < r.FieldCount; i++)
                     {
                         object v = row[i];
-                        if (null != v)
-                        { 
+                        if (DBNull.Value != v)
+                        {
                             v = v.ToString();
                         }
+                        else
+                            v = DBNull.Value;
                         r.SetValue(i, v);
                     }
 
