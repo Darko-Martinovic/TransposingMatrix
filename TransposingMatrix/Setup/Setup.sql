@@ -32,10 +32,15 @@ BEGIN
 --
 ------------------------!Replace password with more appropriate for your situation.!!!!!!!!!!!!!!!!!!!!!!!----------------------------------
 --------------------------------------------------------------------------------------
-DECLARE @path nvarchar(260) = N'D:\VS2017_PROJECTS\TransposingMatrix\TransposingMatrix\askTransposingMatrix.snk'
-DECLARE @password nvarchar(128) = N'S#im@ple1Tal0k'
+DECLARE @path nvarchar(MAX) 
+DECLARE @password nvarchar(128) 
+DECLARE @tsqlToEval as nvarchar(max) 
 
-DECLARE @tsqlToEval as nvarchar(max) = N'USE MASTER;' + CHAR(13) + 
+--Should be separated because of SQL2005 support 
+
+SET @path =  N'D:\VS2017_PROJECTS\TransposingMatrix\TransposingMatrix\askTransposingMatrix.snk';
+SET @password =  N'S#im@ple1Tal0k';
+SET @tsqlToEval =  N'USE MASTER;' + CHAR(13) + 
 				    'CREATE ASYMMETRIC KEY [askTransposingMatrix]' + char(13 ) + 
 				    'FROM FILE = ''' + @path + '''
 				    ENCRYPTION BY PASSWORD = '''+ @password+ '''';
