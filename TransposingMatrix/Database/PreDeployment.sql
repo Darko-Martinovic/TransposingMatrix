@@ -23,7 +23,17 @@ BEGIN
 --
 --Replace the path 'D:\VS2017_PROJECTS\TransposingMatrix\TransposingMatrix\' with your path
 --
+------------------------!Replace password with more appropriate for your situation.!!!!!!!!!!!!!!!!!!!!!!!----------------------------------
 --------------------------------------------------------------------------------------
+DECLARE @path nvarchar(260) = N'D:\VS2017_PROJECTS\TransposingMatrix\TransposingMatrix\askTransposingMatrix.snk'
+DECLARE @password nvarchar(128) = N'S#im@ple1Tal0k'
+
+DECLARE @tsqlToEval as nvarchar(max) = N'USE MASTER;' + CHAR(13) + 
+				    'CREATE ASYMMETRIC KEY [askTransposingMatrix]' + char(13 ) + 
+				    'FROM FILE = ''' + @path + '''
+				    ENCRYPTION BY PASSWORD = '''+ @password+ '''';
+--PRINT @tsqlToEval
+
     IF
     (
 	   SELECT COUNT(*)
@@ -31,11 +41,7 @@ BEGIN
 	   WHERE name LIKE 'askTransposingMatrix%'
     ) = 0
     BEGIN
-       EXEC sp_executesql
-				    N'USE MASTER;
-				    CREATE ASYMMETRIC KEY [askTransposingMatrix]
-				    FROM FILE = ''D:\VS2017_PROJECTS\TransposingMatrix\TransposingMatrix\askTransposingMatrix.snk''
-				    ENCRYPTION BY PASSWORD = ''SimpleTalk''';
+       EXEC sp_executesql @tsqlToEval;
     END;
     IF NOT EXISTS
     (
