@@ -25,7 +25,7 @@ BEGIN
 --
 ------------------------!Replace password with more appropriate for your situation.!!!!!!!!!!!!!!!!!!!!!!!----------------------------------
 --------------------------------------------------------------------------------------
-DECLARE @path nvarchar(MAX) 
+DECLARE @path nvarchar(260) 
 DECLARE @password nvarchar(128) 
 DECLARE @tsqlToEval as nvarchar(max) 
 
