@@ -55,18 +55,7 @@ IF SERVERPROPERTY('productversion') >= '14' AND
     SUBSTRING(CAST(SERVERPROPERTY('productversion') as nvarchar(10)),1,1) != '9'
     BEGIN
 
-IF
-(
-    SELECT COUNT(*)
-    FROM master.sys.asymmetric_keys
-    WHERE name = 'askTransposingMatrix'
-) > 0
-            BEGIN
-                EXEC sp_executesql
-N'USE MASTER;
-DROP ASYMMETRIC KEY [askTransposingMatrix]';
-            END;
-        IF EXISTS
+  IF EXISTS
 (
     SELECT loginname
     FROM master.dbo.syslogins
@@ -77,5 +66,17 @@ DROP ASYMMETRIC KEY [askTransposingMatrix]';
                 SELECT @SqlStatement = 'DROP LOGIN [loginTransposingMatrix]';
                 EXEC sp_executesql
                      @SqlStatement;
+            END;
+
+IF
+(
+    SELECT COUNT(*)
+    FROM master.sys.asymmetric_keys
+    WHERE name = 'askTransposingMatrix'
+) > 0
+            BEGIN
+                EXEC sp_executesql
+N'USE MASTER;
+DROP ASYMMETRIC KEY [askTransposingMatrix]';
             END;
 END
