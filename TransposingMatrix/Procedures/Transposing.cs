@@ -13,7 +13,7 @@ public partial class StoredProcedures
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void Transposing
         (
-        SqlString Query,                                                      // the query or the stored procedure name. If we pass the stored procedure
+        SqlString Query,                                                      // the query or the stored procedure name. Calling a stored procedure always should begin with keyword EXEC.
         [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString Params,        // the query or the stored procedure parameters 
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 Rco,               // rotate column ordinal
         [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 KeyValueOption,    // do we use key value option
