@@ -8,41 +8,41 @@ using TransposingMatrix;
 public partial class StoredProcedures
 {
 
-    public const int MAX_COLS = 1000;
+    public const int MaxCols = 1000;
 
     [Microsoft.SqlServer.Server.SqlProcedure]
     public static void Transposing
         (
-        SqlString Query,                                                      // the query or the stored procedure name. Calling a stored procedure always should begin with keyword EXEC.
+        SqlString query,                                                      // the query or the stored procedure name. Calling a stored procedure always should begin with keyword EXEC.
         [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString Params,        // the query or the stored procedure parameters 
-        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 Rco,               // rotate column ordinal
-        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 KeyValueOption,    // do we use key value option
-        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString ColumnMapping, // columns mappings
-        [SqlFacet(IsNullable = true, MaxSize = 256)]SqlString TableName       // temp(permanent) table name
+        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 rco,               // rotate column ordinal
+        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 keyValueOption,    // do we use key value option
+        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString columnMapping, // columns mappings
+        [SqlFacet(IsNullable = true, MaxSize = 256)]SqlString tableName       // temp(permanent) table name
 
         )
     {
-        DataSet ds = null;
-        string errorString = "";
+        DataSet ds;
+        var errorString = "";
         try
         {
-            bool mySp = false;
-            string queryValue = Query.Value.ToString();
+            var queryValue = query.Value;
             SqlParameter[] listOfParams = null;
-            string[] splitQueries = queryValue.Split(';');
+
 
             //
             // Make parameters
             //
-            if (Params.IsNull == false && Params.Value.ToString().Equals(string.Empty) == false)
+            if (Params.IsNull == false && Params.Value.Equals(string.Empty) == false)
                 listOfParams = DataAccess.MakeParams(Params.Value, ref errorString);
 
+            var pipe = SqlContext.Pipe;
             //
             // Quit if any errors
             //
             if (errorString.Equals(string.Empty) == false)
             {
-                SqlContext.Pipe.Send("There is an error when trying to determine parameters ! Error :" + errorString);
+                pipe?.Send($"There is an error when trying to determine parameters ! Error :{errorString}");
                 return;
             }
 
@@ -52,7 +52,6 @@ public partial class StoredProcedures
             //
             ds = DataAccess.GetDataSet(
                                          queryValue, 
-                                         mySp, 
                                          listOfParams,
                                          ref errorString
                                       );
@@ -62,7 +61,7 @@ public partial class StoredProcedures
             //
             if (errorString.Equals(string.Empty) == false)
             {
-                SqlContext.Pipe.Send("There is an error when trying to determine the dataset ! Error :" + errorString);
+                pipe?.Send($"There is an error when trying to determine the dataset ! Error :{errorString}");
                 return;
             }
 
@@ -72,56 +71,49 @@ public partial class StoredProcedures
             //
             foreach (DataTable t in ds.Tables)
             {
-                DataTable tblCopy = t;
+                var tblCopy = t;
 
                 //
-                // Temporary limitation to MAX_COLS
+                // Temporary limitation to MaxCols
                 //
-                if (t.Rows.Count > MAX_COLS)
+                if (t.Rows.Count > MaxCols)
                 {
-                    SqlContext.Pipe.Send("You are trying to generate table with more then : " + MAX_COLS.ToString() + 
-                                         " columns! I will display first " + MAX_COLS.ToString() + " columns !");
+                    pipe?.Send(
+                        $"You are trying to generate table with more then : {MaxCols} columns! I will display first {MaxCols} columns !");
                     tblCopy = t.Clone();
 
                     //
                     // Use the ImportRow method to copy from original table to its clone
                     //
-                    for (int i = 0; i <= MAX_COLS; ++i)
-                    {
+                    for (var i = 0; i <= MaxCols; ++i)
                         tblCopy.ImportRow(t.Rows[i]);
-                    }
-                
                 }
-                DataTable tblRt = null;
-                if (KeyValueOption.Value == 0)
-                {
-                     tblRt= TableManipulation.RotateTable(tblCopy,Rco.Value);
-                }
-                else
-                {
-                    tblRt = TableManipulation.RotateTableWithKeyValue(tblCopy, ColumnMapping.IsNull ? null : ColumnMapping.Value);
-                }
+
+                var tblRt = keyValueOption.Value == 0
+                    ? TableManipulation.RotateTable(tblCopy, rco.Value)
+                    : TableManipulation.RotateTableWithKeyValue(tblCopy,
+                        columnMapping.IsNull ? null : columnMapping.Value);
 
                 //
                 // If we want to save our results
                 //
-                if (TableName.IsNull == false)
+                if (tableName.IsNull == false)
                 {
-                    string[] fullName = TableName.Value.Split('.');
-                    string partialTableName = fullName[fullName.Length - 1];
+                    var fullName = tableName.Value.Split('.');
+                    var partialTableName = fullName[fullName.Length - 1];
 
                     //
                     // First we build T-SQL to create the table 
                     //
-                    string cmdToExecute = DataAccess.CreateTABLE(TableName.Value, tblRt);
+                    string cmdToExecute = DataAccess.CreateTable(tableName.Value, tblRt);
                     // 
                     // Then build T-SQL to create the table value type ( SQL 2008+ )
                     //
-                    cmdToExecute += ";\n" +  DataAccess.CreateTYPE(partialTableName, tblRt);
+                    cmdToExecute += ";\n" +  DataAccess.CreateType(partialTableName, tblRt);
 
                     DataAccess.ExecuteNonQuery(cmdToExecute);
 
-                    DataAccess.SaveResult(TableName.Value, tblRt);
+                    DataAccess.SaveResult(tableName.Value, tblRt);
                     //
                     // Drop the type
                     //
@@ -140,9 +132,9 @@ public partial class StoredProcedures
             errorString = ex.Message;
 
             if (ex.InnerException != null)
-                errorString += "\r\n" + ex.InnerException.Message;
+                errorString += $"\r\n{ex.InnerException.Message}";
 
-            SqlContext.Pipe.Send("There is an error in the stored procedure : " + errorString);
+            SqlContext.Pipe.Send($"There is an error in the stored procedure : {errorString}");
             
 
         }

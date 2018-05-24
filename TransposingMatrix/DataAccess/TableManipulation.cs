@@ -15,15 +15,15 @@ namespace TransposingMatrix
         /// <returns></returns>
         public static DataTable RotateTableWithKeyValue(DataTable oldTable,string columnMapping)
         {
-            DataTable newTable = new DataTable();
-            DataRow dr = default(DataRow);
+            var newTable = new DataTable();
+            var dr = default(DataRow);
 
             // The column mapping is not provided,so create the generic header
             if ( columnMapping == null )
             {
                 //the first column name is key
                 newTable.Columns.Add("Key");
-                int no = 0;
+                var no = 0;
                 foreach (DataRow row in oldTable.Rows)
                 {
                     newTable.Columns.Add("Value" + (no == 0 ? "" : no.ToString().Trim()));
@@ -32,15 +32,15 @@ namespace TransposingMatrix
             }
             else
             {
-                string[] names = columnMapping.Split(',');
-                foreach (string s in names)
+                var names = columnMapping.Split(',');
+                foreach (var s in names)
                 {
                     newTable.Columns.Add(s);
                 }
                 // if we do not pass "enough" names, fill the rest with generic names
                 if ( names.Length < oldTable.Rows.Count+1)
                 {
-                    int no = names.Length;
+                    var no = names.Length;
                     while (no < oldTable.Rows.Count+1)
                     {
                         newTable.Columns.Add("Value" + no.ToString().Trim());
@@ -50,7 +50,7 @@ namespace TransposingMatrix
 
 
             }
-            for (int col = 0; col <= oldTable.Columns.Count - 1; col++)
+            for (var col = 0; col <= oldTable.Columns.Count - 1; col++)
             {
 
                 dr = newTable.NewRow();
@@ -59,7 +59,7 @@ namespace TransposingMatrix
                 dr[0] = oldTable.Columns[col].ColumnName;
 
 
-                for (int row = 0; row <= oldTable.Rows.Count - 1; row++)
+                for (var row = 0; row <= oldTable.Rows.Count - 1; row++)
                 {
                     if (StringExtensions.IsNullOrWhiteSpace(oldTable.Rows[row][col].ToString()))
                     {
@@ -89,8 +89,7 @@ namespace TransposingMatrix
         /// <returns></returns>
         public static DataTable RotateTable(DataTable oldTable, int pco = 0)
         {
-            DataTable newTable = new DataTable();
-            DataRow dr = default(DataRow);
+            var newTable = new DataTable();
 
             if (pco > oldTable.Columns.Count)
             {
@@ -115,13 +114,13 @@ namespace TransposingMatrix
                 if (col == pco)
                     continue;
 
-                dr = newTable.NewRow();
+                var dr = newTable.NewRow();
 
 
                 dr[0] = oldTable.Columns[col].ColumnName;
 
 
-                for (int row = 0; row <= oldTable.Rows.Count - 1; row++)
+                for (var row = 0; row <= oldTable.Rows.Count - 1; row++)
                 {
 
                     if ( StringExtensions.IsNullOrWhiteSpace(oldTable.Rows[row][col].ToString()))
@@ -146,10 +145,10 @@ namespace TransposingMatrix
 
         public static string ByteArrayToString(byte[] ba)
         {
-            StringBuilder hex = new StringBuilder(ba.Length * 2);
-            foreach (byte b in ba)
+            var hex = new StringBuilder(ba.Length * 2);
+            foreach (var b in ba)
                 hex.AppendFormat("{0:X2}", b);
-            return "0x" + hex.ToString();
+            return $"0x{hex}";
         }
 
 

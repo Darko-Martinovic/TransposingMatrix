@@ -16,33 +16,28 @@ namespace TransposingMatrix
         public static void PipeDataTable(DataTable dt)
         {
 
-            SqlMetaData[] md = ExtractDataTableColumnMetaData(dt);
-            SqlDataRecord r = new SqlDataRecord(md);
-            SqlPipe p = SqlContext.Pipe;
+            var md = ExtractDataTableColumnMetaData(dt);
+            var r = new SqlDataRecord(md);
+            var p = SqlContext.Pipe;
 
             //---------------------------------------------------------------------------------------
             //  First is invoked ‘SendResultsStart.’ 
             // ‘SendResultStart’ marks the beginning of a result set to be sent back to the client, 
             //  and uses the r parameter to construct the metadata that describes the result set
             //---------------------------------------------------------------------------------------
-            p.SendResultsStart(r);
+            p?.SendResultsStart(r);
             try
             {
                 foreach (DataRow row in dt.Rows)
                 {
-                    for (int i = 0; i < r.FieldCount; i++)
+                    for (var i = 0; i < r.FieldCount; i++)
                     {
-                        object v = row[i];
-                        if (DBNull.Value != v)
-                        {
-                            v = v.ToString();
-                        }
-                        else
-                            v = DBNull.Value;
+                        var v = row[i];
+                        v = DBNull.Value != v ? (object) v.ToString() : DBNull.Value;
                         r.SetValue(i, v);
                     }
 
-                    p.SendResultsRow(r);
+                    p?.SendResultsRow(r);
                 }
             }
             finally
@@ -50,7 +45,7 @@ namespace TransposingMatrix
                 //
                 // 'SendResultEnd’ marks the end of a result set and returns the SqlPipe instance to the initial state.
                 //
-                p.SendResultsEnd();
+                p?.SendResultsEnd();
             }
         }
 
@@ -59,14 +54,13 @@ namespace TransposingMatrix
         /// Find out metadata ( nvarchar )
         /// </summary>
         /// <param name="dt"></param>
-        /// <param name="objectToString"></param>
         /// <returns></returns>
         private static SqlMetaData[] ExtractDataTableColumnMetaData(DataTable dt)
         {
-            SqlMetaData[] md = new SqlMetaData[dt.Columns.Count];
-            for (int index = 0; index < dt.Columns.Count; index++)
+            var md = new SqlMetaData[dt.Columns.Count];
+            for (var index = 0; index < dt.Columns.Count; index++)
             {
-                DataColumn column = dt.Columns[index];
+                var column = dt.Columns[index];
                 md[index] = SqlMetaDataFromColumn(column);
             }
 
@@ -76,8 +70,8 @@ namespace TransposingMatrix
         private static SqlMetaData SqlMetaDataFromColumn(DataColumn column)
         {
             SqlMetaData smd = null;
-            Type clrType = column.DataType;
-            string name = column.ColumnName;
+            var clrType = column.DataType;
+            var name = column.ColumnName;
             switch (Type.GetTypeCode(clrType))
             {
                 case TypeCode.String:

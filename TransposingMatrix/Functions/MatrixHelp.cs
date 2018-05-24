@@ -15,12 +15,12 @@ namespace TransposingMatrix
         DataAccess = DataAccessKind.None,
         IsDeterministic = true,
                                                                   // The output table definition
-        TableDefinition = @"ParametarName nvarchar(100), ParametarDescription_______________________________________________________________________________________________________ nvarchar(max)")]
+        TableDefinition = @"parametarName nvarchar(100), ParametarDescription_______________________________________________________________________________________________________ nvarchar(max)")]
         public static IEnumerable MatrixHelp(
-            SqlString ProcedureName  //
+            SqlString procedureName  //
             )
         {
-            Dictionary<string, string> list = GetList(ProcedureName.Value);
+            var list = GetList(procedureName.Value);
 
             return list;
 
@@ -29,20 +29,20 @@ namespace TransposingMatrix
         //
         // Insert row
         //
-        private static void ConfigTable_FillRow(object obj, out SqlString ParametarName, out SqlString ParametarDescription)
+        private static void ConfigTable_FillRow(object obj, out SqlString parametarName, out SqlString parametarDescription)
         {
-            ParametarName = ((KeyValuePair<string, string>)(obj)).Key;
-            ParametarDescription = ((KeyValuePair<string, string>)(obj)).Value;
+            parametarName = ((KeyValuePair<string, string>)(obj)).Key;
+            parametarDescription = ((KeyValuePair<string, string>)(obj)).Value;
         }
 
 
         //
         // Let's describe our parameters
         //
-        public static Dictionary<string, string> GetList(string ProcedureName)
+        public static Dictionary<string, string> GetList(string procedureName)
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            if (ProcedureName.ToLower().Equals("matrix.transposing"))
+            var data = new Dictionary<string, string>();
+            if (procedureName.ToLower().Equals("matrix.transposing"))
             {
 
                 data.Add("@Query",
@@ -67,13 +67,13 @@ namespace TransposingMatrix
             }
             else
             {
-                data.Add("Error", "The procedure or the function " + ProcedureName + " does not exists!");
+                data.Add("Error", $"The procedure or the function {procedureName}  does not exists!");
             }
 
             //
             // Do memory cleanup
             //
-            for (int i = 0; i <= GC.MaxGeneration; i++)
+            for (var i = 0; i <= GC.MaxGeneration; i++)
             {
 #if NET_4_5
             GC.Collect(i, GCCollectionMode.Forced,true,true);

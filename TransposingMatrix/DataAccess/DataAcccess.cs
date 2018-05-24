@@ -13,34 +13,33 @@ namespace TransposingMatrix
         /// <summary>
         /// The general routine to get the dataset object
         /// </summary>
-        /// <param name="Query">T-SQL query or the stored procedure name</param>
-        /// <param name="isSp"></param>
+        /// <param name="query">T-SQL query or the stored procedure name</param>
         /// <param name="listOfParams">The query or the stored procedure parameters</param>
         /// <param name="errorText">If an error occurred, we captured the message</param>
         /// <returns></returns>
-        public static DataSet GetDataSet(string Query, bool isSp, SqlParameter[] listOfParams, ref string errorText)
+        public static DataSet GetDataSet(string query,  SqlParameter[] listOfParams, ref string errorText)
         {
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             try
             {
                 //
                 // we must use "context connection=true" keyword
                 //
-                using (SqlConnection cnn = new SqlConnection("context connection=true"))
+                using (var cnn = new SqlConnection("context connection=true"))
                 {
-                    using (SqlCommand command = new SqlCommand(Query, cnn))
+                    using (var command = new SqlCommand(query, cnn))
                     {
                         cnn.Open();
-                        if (isSp)
-                            command.CommandType = CommandType.StoredProcedure;
+                        //if (isSp)
+                        //    command.CommandType = CommandType.StoredProcedure;
                         if (listOfParams != null)
                         {
-                            foreach (SqlParameter p in listOfParams)
+                            foreach (var p in listOfParams)
                             {
                                 command.Parameters.Add(p);
                             }
                         }
-                        using (SqlDataAdapter sqlAdp = new SqlDataAdapter())
+                        using (var sqlAdp = new SqlDataAdapter())
                         {
                             sqlAdp.SelectCommand = command;
                             sqlAdp.Fill(ds);
@@ -60,30 +59,30 @@ namespace TransposingMatrix
         /// <summary>
         /// A wrapper around ExecuteNonQuery. It is used to create a permanent or a temporary table.
         /// </summary>
-        /// <param name="CommandText">DDL command</param>
+        /// <param name="commandText">DDL command</param>
         /// <returns></returns>
-        public static bool ExecuteNonQuery(string CommandText)
+        public static bool ExecuteNonQuery(string commandText)
         {
-            bool retValue = true;
+            var retValue = false;
             try
             {
 
                 //
                 // we must use "context connection=true" keyword
                 //
-                using (SqlConnection cnn = new SqlConnection("context connection=true"))
+                using (var cnn = new SqlConnection("context connection=true"))
                 {
-                    using (SqlCommand command = new SqlCommand(CommandText, cnn))
+                    using (var command = new SqlCommand(commandText, cnn))
                     {
                         cnn.Open();
                         command.ExecuteNonQuery();
+                        retValue = true;
                         cnn.Close();
                     }
                 }
             }
             catch (Exception ex)
             {
-                retValue = false;
                 throw new Exception(ex.Message);
             }
             return retValue;
@@ -95,22 +94,22 @@ namespace TransposingMatrix
         /// I used mapping of the datatable object to SqlDbType.Structed parameter. 
         /// The structed parameter = SQL Server table value type
         /// </summary>
-        /// <param name="TblName">The temporary table name</param>
+        /// <param name="tblName">The temporary table name</param>
         /// <param name="dt">The datatable object</param>
         /// <returns></returns>
-        public static bool SaveResult(string TblName, DataTable dt)
+        public static bool SaveResult(string tblName, DataTable dt)
         {
             bool retValue = true;
             try
             {
 
-                string[] fullName = TblName.Split('.');
+                string[] fullName = tblName.Split('.');
                 string partialTableName = fullName[fullName.Length - 1];
 
                 using (SqlConnection cnn = new SqlConnection("context connection=true"))
                 {
                     string colNames = GetTableColumns(dt);
-                    string cmdText = "INSERT INTO " + TblName + " (" + colNames + ")" + "\n";
+                    string cmdText = "INSERT INTO " + tblName + " (" + colNames + ")" + "\n";
                     cmdText += " SELECT " + colNames + " FROM @tvpTable ";
 
                     using (SqlCommand command = new SqlCommand(cmdText, cnn))
@@ -227,19 +226,17 @@ namespace TransposingMatrix
         /// <returns></returns>
         public static int DeterminSize(string size, ref byte scale)
         {
-            int retValue = 0;
-            string[] splitter = size.Split(',');
+            var retValue = 0;
+            var splitter = size.Split(',');
             if (splitter.Length >= 1)
             {
-                int outValue = 0;
-                bool refer = Int32.TryParse(splitter[0], out outValue);
+                var refer = int.TryParse(splitter[0], out var outValue);
                 if (refer)
                     retValue = outValue;
             }
             if (splitter.Length == 2)
             {
-                byte ref1 = 0;
-                bool res = Byte.TryParse(splitter[1], out ref1);
+                var res = byte.TryParse(splitter[1], out var ref1);
                 if (res)
                     scale = ref1;
             }
@@ -251,16 +248,16 @@ namespace TransposingMatrix
         /// That the way how to make parameters collection
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="html"></param>
+        /// <param name="errorText"></param>
         /// <returns></returns>
         public static SqlParameter[] MakeParams(string value, ref string errorText)
         {
             SqlParameter[] sp = null;
             try
             {
-                string[] splitter = Regex.Replace(value, "\r\n", "", RegexOptions.IgnoreCase).Split(',');
-                Dictionary<int, string> pureString = new Dictionary<int, string>();
-                for (int i = 0; i < splitter.Length; i++)
+                var splitter = Regex.Replace(value, "\r\n", "", RegexOptions.IgnoreCase).Split(',');
+                var pureString = new Dictionary<int, string>();
+                for (var i = 0; i < splitter.Length; i++)
                 {
                     if (splitter[i].Contains("@") == false && i > 0)
                     {
@@ -270,22 +267,26 @@ namespace TransposingMatrix
                     pureString.Add(i, splitter[i].Trim());
                 }
 
-                int counter = 0;
-                foreach (string s in pureString.Values)
+                var counter = 0;
+                foreach (var s in pureString.Values)
                 {
-                    SqlParameter s1 = new SqlParameter();
-                    s1.ParameterName = s.Trim().Substring(0, s.Trim().IndexOf(' '));
+                    var s1 = new SqlParameter
+                    {
+                        ParameterName = s.Trim().Substring(0, s.Trim().IndexOf(' '))
+                    };
                     string[] valueSpliiter = s.Split('=');
                     if (valueSpliiter.Length > 1)
                     {
-                        string tester = valueSpliiter[0].Substring(valueSpliiter[0].IndexOf(' '), valueSpliiter[0].Length - valueSpliiter[0].IndexOf(' '));
+                        var tester = valueSpliiter[0].Substring(valueSpliiter[0].IndexOf(' '),
+                            valueSpliiter[0].Length - valueSpliiter[0].IndexOf(' '));
                         s1.SqlDbType = DetermineSqlDbType(tester, ref errorText);
                         if (tester.Contains("("))
                         {
-                            string pomValue = Regex.Replace(tester, " ", "", RegexOptions.IgnoreCase);
-                            string size = pomValue.Substring(pomValue.IndexOf("(") + 1, pomValue.IndexOf(")") - pomValue.IndexOf("(") - 1);
+                            var pomValue = Regex.Replace(tester, " ", "", RegexOptions.IgnoreCase);
+                            var pos = pomValue.IndexOf("(", StringComparison.Ordinal);
+                            var size = pomValue.Substring( pos + 1, pomValue.IndexOf(")", StringComparison.Ordinal) - pos - 1);
                             byte scale = 0;
-                            int sizeTester = DeterminSize(size, ref scale);
+                            var sizeTester = DeterminSize(size, ref scale);
                             if (sizeTester != 0)
                                 s1.Size = sizeTester;
                             if (scale != 0)
@@ -383,9 +384,8 @@ namespace TransposingMatrix
             }
             else if (s1.SqlDbType == SqlDbType.Bit) // Bit to boolean
             {
-                bool result;
                 string valueString = Regex.Replace(valueSplitter, "'", "", RegexOptions.IgnoreCase).Trim();
-                bool succ = Boolean.TryParse(valueString, out result);
+                var succ = bool.TryParse(valueString, out var result);
                 if (succ)
                     s1.Value = result;
 
@@ -428,17 +428,12 @@ namespace TransposingMatrix
         /// <param name="tableName"></param>
         /// <param name="table"></param>
         /// <returns></returns>
-        public static string CreateTABLE(string tableName, DataTable table)
+        public static string CreateTable(string tableName, DataTable table)
         {
-            string sqlsc;
-            if (tableName.StartsWith("#") == false)
-            {
-                sqlsc = "IF OBJECT_ID('{0}', 'U') IS NOT NULL" + "\n";
-            }
-            else
-            {
-                sqlsc = "IF OBJECT_ID('tempdb.dbo.{0}', 'U') IS NOT NULL" + "\n";
-            }
+            var sqlsc = tableName.StartsWith("#") == false
+                ? "IF OBJECT_ID('{0}', 'U') IS NOT NULL" + "\n"
+                : "IF OBJECT_ID('tempdb.dbo.{0}', 'U') IS NOT NULL" + "\n";
+
             sqlsc += "DROP TABLE {0};" + "\n";
             sqlsc = string.Format(sqlsc, tableName);
             sqlsc += "CREATE TABLE " + tableName + "(";
@@ -468,11 +463,12 @@ namespace TransposingMatrix
                         break;
                     case "System.String":
                     default:
-                        sqlsc += string.Format(" nvarchar({0}) ", table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString());
+                        sqlsc +=
+                            $" nvarchar({(table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString())}) ";
                         break;
                 }
                 if (table.Columns[i].AutoIncrement)
-                    sqlsc += " IDENTITY(" + table.Columns[i].AutoIncrementSeed.ToString() + "," + table.Columns[i].AutoIncrementStep.ToString() + ") ";
+                    sqlsc += $" IDENTITY({table.Columns[i].AutoIncrementSeed},{table.Columns[i].AutoIncrementStep}) ";
                 if (!table.Columns[i].AllowDBNull)
                     sqlsc += " NOT NULL ";
                 sqlsc += ",";
@@ -487,16 +483,15 @@ namespace TransposingMatrix
         /// <param name="tableName"></param>
         /// <param name="table"></param>
         /// <returns></returns>
-        public static string CreateTYPE(string tableName, DataTable table)
+        public static string CreateType(string tableName, DataTable table)
         {
-            string sqlsc;
-            sqlsc = "IF EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id" + "\n";
-            sqlsc += "WHERE st.name = N'TVP_" + tableName + "' AND ss.name = N'MATRIX')" + "\n";
+            var sqlsc = "IF EXISTS (SELECT * FROM sys.types st JOIN sys.schemas ss ON st.schema_id = ss.schema_id" + "\n";
+            sqlsc += $"WHERE st.name = N\'TVP_{tableName}\' AND ss.name = N\'MATRIX\')\n";
             sqlsc += "DROP TYPE MATRIX.TVP_{0};" + "\n";
 
             sqlsc = string.Format(sqlsc, tableName);
             sqlsc += "CREATE TYPE MATRIX.TVP_" + tableName + " AS TABLE (";
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (var i = 0; i < table.Columns.Count; i++)
             {
                 sqlsc += "\n [" + table.Columns[i].ColumnName + "] ";
                 string columnType = table.Columns[i].DataType.ToString();
@@ -522,7 +517,8 @@ namespace TransposingMatrix
                         break;
                     case "System.String":
                     default:
-                        sqlsc += string.Format(" nvarchar({0}) ", table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString());
+                        sqlsc +=
+                            $" nvarchar({(table.Columns[i].MaxLength == -1 ? "max" : table.Columns[i].MaxLength.ToString())}) ";
                         break;
                 }
                 if (!table.Columns[i].AllowDBNull)

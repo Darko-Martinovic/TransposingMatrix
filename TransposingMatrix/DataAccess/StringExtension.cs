@@ -5,15 +5,11 @@ namespace TransposingMatrix
     {
         public static bool IsNullOrWhiteSpace(string value)
         {
-            if (value != null)
+            if (value == null) return true;
+            for (var i = 0; i < value.Length; i++)
             {
-                for (int i = 0; i < value.Length; i++)
-                {
-                    if (!char.IsWhiteSpace(value[i]))
-                    {
-                        return false;
-                    }
-                }
+                if (!char.IsWhiteSpace(value[i]))
+                    return false;
             }
             return true;
         }
