@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: SQL Server ${{ matrix.sql-server }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        sql-server: ["2022", "2025"]
+    env:
+      # The tests start this SQL Server in a container with Testcontainers
+      MSSQL_IMAGE: mcr.microsoft.com/mssql/server:${{ matrix.sql-server }}-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build TransposingMatrix.slnx
+      - run: dotnet test --solution TransposingMatrix.slnx --no-build

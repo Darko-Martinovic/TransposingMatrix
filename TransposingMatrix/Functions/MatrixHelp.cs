@@ -1,95 +1,64 @@
-using System;
-using System.Data.SqlTypes;
-using Microsoft.SqlServer.Server;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
+using Microsoft.SqlServer.Server;
 
 namespace TransposingMatrix
 {
-
     public partial class UserDefinedFunctions
     {
-        [Microsoft.SqlServer.Server.SqlFunction(
-         Name = "Help",                                           // The function name
-        FillRowMethodName = "ConfigTable_FillRow",                
-        DataAccess = DataAccessKind.None,
-        IsDeterministic = true,
-                                                                  // The output table definition
-        TableDefinition = @"parametarName nvarchar(100), ParametarDescription_______________________________________________________________________________________________________ nvarchar(max)")]
-        public static IEnumerable MatrixHelp(
-            SqlString procedureName  //
-            )
+        [SqlFunction(
+            Name = "Help",                                                  // The function name
+            FillRowMethodName = nameof(ConfigTable_FillRow),
+            DataAccess = DataAccessKind.None,
+            IsDeterministic = true,
+            TableDefinition = "ParameterName nvarchar(100), ParameterDescription nvarchar(max)")] // The output table definition
+        public static IEnumerable MatrixHelp(SqlString procedureName)
         {
-            var list = GetList(procedureName.Value);
-
-            return list;
-
+            return GetList(procedureName.IsNull ? "" : procedureName.Value);
         }
 
         //
         // Insert row
         //
-        private static void ConfigTable_FillRow(object obj, out SqlString parametarName, out SqlString parametarDescription)
+        private static void ConfigTable_FillRow(object obj, out SqlString parameterName, out SqlString parameterDescription)
         {
-            parametarName = ((KeyValuePair<string, string>)(obj)).Key;
-            parametarDescription = ((KeyValuePair<string, string>)(obj)).Value;
+            var row = (KeyValuePair<string, string>)obj;
+            parameterName = row.Key;
+            parameterDescription = row.Value;
         }
-
 
         //
         // Let's describe our parameters
         //
-        public static Dictionary<string, string> GetList(string procedureName)
+        public static List<KeyValuePair<string, string>> GetList(string procedureName)
         {
-            var data = new Dictionary<string, string>();
-            if (procedureName.ToLower().Equals("matrix.transposing"))
+            var data = new List<KeyValuePair<string, string>>();
+            var name = procedureName.Replace("[", "").Replace("]", "").Trim().ToLowerInvariant();
+            if (name == "matrix.transposing" || name == "transposing")
             {
-
-                data.Add("@Query",
-                    "Query or stored procedure, which result will be transposed. Calling a stored procedure always should begin with keyword EXEC.");
-
-                data.Add("@Params",
-                    "Query or stored procedure parameters.");
-
-                data.Add("@Rco",
-                    "Rotate column ordinal. Default is 0.");
-
-                data.Add("@KeyValueOption",
-                    "Do we use key-value option. Default is 0.");
-
-                data.Add("@ColumnMapping",
-                    "Columns mappings. Default is null.");
-
-                data.Add("@TableName",
-                    "If you like to save result into temporary or permanent table. For SQL Server 2008+");
-
-
+                Add(data, "@Query",
+                    "The query or stored procedure whose result is transposed. Calling a stored procedure always begins with the keyword EXEC.");
+                Add(data, "@Params",
+                    "The query's parameters, declared as in DECLARE, for example: @id int = 1, @name nvarchar(50) = N'Bikes'. Default is null.");
+                Add(data, "@Rco",
+                    "Rotate column ordinal: the column, counted from 0, whose values become the header. Default is 0.");
+                Add(data, "@KeyValueOption",
+                    "1 for a generic Key, Value, Value1... header, or the names in @ColumnMapping. Default is 0.");
+                Add(data, "@ColumnMapping",
+                    "The header's names with @KeyValueOption = 1, comma separated; missing names are filled with ValueN. Default is null.");
+                Add(data, "@TableName",
+                    "A global temporary table (##name) or a permanent table to save the result in; a table of that name is replaced. Default is null.");
             }
             else
             {
-                data.Add("Error", $"The procedure or the function {procedureName}  does not exists!");
+                Add(data, "Error", $"The procedure or the function {procedureName} does not exist!");
             }
-
-            //
-            // Do memory cleanup
-            //
-            for (var i = 0; i <= GC.MaxGeneration; i++)
-            {
-#if NET_4_5
-            GC.Collect(i, GCCollectionMode.Forced,true,true);
-#elif NET_4_0
-            GC.Collect(i, GCCollectionMode.Forced,true);
-#elif NET_3_5
-            GC.Collect(i, GCCollectionMode.Forced);
-#else
-                GC.Collect(i, GCCollectionMode.Forced);
-#endif
-            }
-
-            GC.WaitForPendingFinalizers();
 
             return data;
         }
 
+        private static void Add(List<KeyValuePair<string, string>> data, string key, string value) =>
+            data.Add(new KeyValuePair<string, string>(key, value));
     }
 }
