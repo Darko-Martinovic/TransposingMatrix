@@ -1,152 +1,91 @@
 using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Data.SqlTypes;
 using Microsoft.SqlServer.Server;
-using TransposingMatrix;
 
-public partial class StoredProcedures
+namespace TransposingMatrix
 {
-
-    public const int MaxCols = 1000;
-
-    [Microsoft.SqlServer.Server.SqlProcedure]
-    public static void Transposing
-        (
-        SqlString query,                                                      // the query or the stored procedure name. Calling a stored procedure always should begin with keyword EXEC.
-        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString Params,        // the query or the stored procedure parameters 
-        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 rco,               // rotate column ordinal
-        [SqlFacet(IsNullable = true, MaxSize = 4)]SqlInt16 keyValueOption,    // do we use key value option
-        [SqlFacet(IsNullable = true, MaxSize = 4000)]SqlString columnMapping, // columns mappings
-        [SqlFacet(IsNullable = true, MaxSize = 256)]SqlString tableName       // temp(permanent) table name
-
-        )
+    public partial class StoredProcedures
     {
-        DataSet ds;
-        var errorString = "";
-        try
+        /// <summary>
+        /// The most rows a result may have. Each row becomes a column, and SQL Server tables hold
+        /// at most 1024 columns.
+        /// </summary>
+        public const int MaxRows = 1000;
+
+        [SqlProcedure]
+        public static void Transposing
+            (
+            SqlString query,                                                      // the query, or EXEC and a stored procedure with its arguments
+            [SqlFacet(IsNullable = true, MaxSize = 4000)] SqlString parameters,   // the query's parameters, declared as in DECLARE: @id int = 1, @name nvarchar(50) = N'x'
+            SqlInt16 rco,                                                         // rotate column ordinal: the column whose values become the header
+            SqlInt16 keyValueOption,                                              // 1: a generic Key, Value, Value1... header instead
+            [SqlFacet(IsNullable = true, MaxSize = 4000)] SqlString columnMapping,// the header's names with keyValueOption 1, comma separated
+            [SqlFacet(IsNullable = true, MaxSize = 256)] SqlString tableName      // a global temporary (##) or permanent table to save the result in
+            )
         {
-            var queryValue = query.Value;
-            SqlParameter[] listOfParams = null;
-
-
-            //
-            // Make parameters
-            //
-            if (Params.IsNull == false && Params.Value.Equals(string.Empty) == false)
-                listOfParams = DataAccess.MakeParams(Params.Value, ref errorString);
-
-            var pipe = SqlContext.Pipe;
-            //
-            // Quit if any errors
-            //
-            if (errorString.Equals(string.Empty) == false)
+            try
             {
-                pipe?.Send($"There is an error when trying to determine parameters ! Error :{errorString}");
-                return;
-            }
-
-
-            //
-            // Determine the dataset object
-            //
-            ds = DataAccess.GetDataSet(
-                                         queryValue, 
-                                         listOfParams,
-                                         ref errorString
-                                      );
-
-            //
-            // Quit if any errors
-            //
-            if (errorString.Equals(string.Empty) == false)
-            {
-                pipe?.Send($"There is an error when trying to determine the dataset ! Error :{errorString}");
-                return;
-            }
-
-
-            //
-            // Let's iterate through the table collection
-            //
-            foreach (DataTable t in ds.Tables)
-            {
-                var tblCopy = t;
+                if (query.IsNull || query.Value.Trim().Length == 0)
+                    throw new TransposingException("@Query is required.");
 
                 //
-                // Temporary limitation to MaxCols
+                // The parameters are a DECLARE list, so SQL Server itself parses their types and values
                 //
-                if (t.Rows.Count > MaxCols)
+                var batch = parameters.IsNull || parameters.Value.Trim().Length == 0
+                    ? query.Value
+                    : $"DECLARE {parameters.Value};\n{query.Value}";
+
+                var results = DataAccess.GetResults(batch, MaxRows);
+                var saveTo = tableName.IsNull || tableName.Value.Trim().Length == 0 ? null : tableName.Value.Trim();
+
+                for (var i = 0; i < results.Count; i++)
                 {
-                    pipe?.Send(
-                        $"You are trying to generate table with more then : {MaxCols} columns! I will display first {MaxCols} columns !");
-                    tblCopy = t.Clone();
+                    var result = results[i];
+                    if (result.Truncated)
+                        PipeUtilities.Print($"The result has more than {MaxRows} rows: only the first {MaxRows} are transposed.");
+
+                    var rotated = !keyValueOption.IsNull && keyValueOption.Value != 0
+                        ? TableManipulation.RotateTableWithKeyValue(result, columnMapping.IsNull ? null : columnMapping.Value)
+                        : TableManipulation.RotateTable(result, rco.IsNull ? 0 : rco.Value);
+
+                    if (saveTo != null && i == 0)
+                        DataAccess.SaveResult(saveTo, rotated);
+                    else if (saveTo != null)
+                        PipeUtilities.Print($"Only the first result is saved in {saveTo}; result {i + 1} is not.");
 
                     //
-                    // Use the ImportRow method to copy from original table to its clone
+                    // Send the result to the client
                     //
-                    for (var i = 0; i <= MaxCols; ++i)
-                        tblCopy.ImportRow(t.Rows[i]);
+                    PipeUtilities.PipeTable(rotated);
                 }
-
-                var tblRt = keyValueOption.Value == 0
-                    ? TableManipulation.RotateTable(tblCopy, rco.Value)
-                    : TableManipulation.RotateTableWithKeyValue(tblCopy,
-                        columnMapping.IsNull ? null : columnMapping.Value);
-
-                //
-                // If we want to save our results
-                //
-                if (tableName.IsNull == false)
-                {
-                    var fullName = tableName.Value.Split('.');
-                    var partialTableName = fullName[fullName.Length - 1];
-
-                    //
-                    // First we build T-SQL to create the table 
-                    //
-                    string cmdToExecute = DataAccess.CreateTable(tableName.Value, tblRt);
-                    // 
-                    // Then build T-SQL to create the table value type ( SQL 2008+ )
-                    //
-                    cmdToExecute += ";\n" +  DataAccess.CreateType(partialTableName, tblRt);
-
-                    DataAccess.ExecuteNonQuery(cmdToExecute);
-
-                    DataAccess.SaveResult(tableName.Value, tblRt);
-                    //
-                    // Drop the type
-                    //
-                    DataAccess.ExecuteNonQuery("DROP TYPE MATRIX.TVP_" + partialTableName);
-                }
-                //
-                // Send the result to the client
-                //
-                PipeUtilities.PipeDataTable(tblRt);
-
             }
-
+            catch (Exception ex)
+            {
+                PipeUtilities.RaiseError(ErrorMessage(ex));
+            }
         }
-        catch (Exception ex)
+
+        private static string ErrorMessage(Exception ex)
         {
-            errorString = ex.Message;
+            if (ex is TransposingException)
+                return ex.Message;
 
-            if (ex.InnerException != null)
-                errorString += $"\r\n{ex.InnerException.Message}";
-
-            SqlContext.Pipe.Send($"There is an error in the stored procedure : {errorString}");
-            
-
+            var message = $"MATRIX.Transposing failed: {ex.Message}";
+            //
+            // The in-process data access of .NET Framework predates the json and vector types of
+            // SQL Server 2025, and fails on them with this message
+            //
+            if (ex.Message.Contains("Inproc data access"))
+                message += " If the query returns json or vector columns, CAST them to nvarchar(max).";
+            return message;
         }
-        finally
-        {
-            ds = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-        }
-
-
     }
 
-
+    /// <summary>A mistake in the procedure's arguments, reported as it is.</summary>
+    public sealed class TransposingException : Exception
+    {
+        public TransposingException(string message) : base(message)
+        {
+        }
+    }
 }

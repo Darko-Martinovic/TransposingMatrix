@@ -1,105 +1,86 @@
-using System;
 using System.Data;
-using System.Data.SqlTypes;
+using System.Data.SqlClient;
 using Microsoft.SqlServer.Server;
 
 namespace TransposingMatrix
 {
     public static class PipeUtilities
     {
-
+        // RAISERROR takes a message of up to 2047 characters
+        private const int MaxMessageLength = 2047;
 
         /// <summary>
-        /// Send the result back to the client
+        /// Send the result back to the client, every column as nvarchar(max)
         /// </summary>
-        /// <param name="dt"></param>
-        public static void PipeDataTable(DataTable dt)
+        public static void PipeTable(ResultTable table)
         {
+            var md = new SqlMetaData[table.Columns.Count];
+            for (var i = 0; i < md.Length; i++)
+                md[i] = new SqlMetaData(table.Columns[i], SqlDbType.NVarChar, SqlMetaData.Max);
 
-            var md = ExtractDataTableColumnMetaData(dt);
             var r = new SqlDataRecord(md);
             var p = SqlContext.Pipe;
 
             //---------------------------------------------------------------------------------------
-            //  First is invoked ‘SendResultsStart.’ 
-            // ‘SendResultStart’ marks the beginning of a result set to be sent back to the client, 
+            //  First is invoked "SendResultsStart".
+            // "SendResultsStart" marks the beginning of a result set to be sent back to the client,
             //  and uses the r parameter to construct the metadata that describes the result set
             //---------------------------------------------------------------------------------------
-            p?.SendResultsStart(r);
+            p.SendResultsStart(r);
             try
             {
-                foreach (DataRow row in dt.Rows)
+                foreach (var row in table.Rows)
                 {
-                    for (var i = 0; i < r.FieldCount; i++)
+                    for (var i = 0; i < row.Length; i++)
                     {
-                        var v = row[i];
-                        v = DBNull.Value != v ? (object) v.ToString() : DBNull.Value;
-                        r.SetValue(i, v);
+                        if (row[i] == null)
+                            r.SetDBNull(i);
+                        else
+                            r.SetString(i, row[i]);
                     }
 
-                    p?.SendResultsRow(r);
+                    p.SendResultsRow(r);
                 }
             }
             finally
             {
                 //
-                // 'SendResultEnd’ marks the end of a result set and returns the SqlPipe instance to the initial state.
+                // "SendResultsEnd" marks the end of a result set and returns the SqlPipe instance to the initial state.
                 //
-                p?.SendResultsEnd();
+                p.SendResultsEnd();
             }
         }
-
 
         /// <summary>
-        /// Find out metadata ( nvarchar )
+        /// A message, as PRINT sends it.
         /// </summary>
-        /// <param name="dt"></param>
-        /// <returns></returns>
-        private static SqlMetaData[] ExtractDataTableColumnMetaData(DataTable dt)
+        public static void Print(string message) => SqlContext.Pipe.Send(message);
+
+        /// <summary>
+        /// Raises error 50000, where a message from Pipe.Send would only be printed: the client
+        /// gets an error and @@ERROR is set, but T-SQL's TRY...CATCH doesn't see an error sent
+        /// this way. RAISERROR, unlike THROW, lets the rest of the caller's batch run, as a failed
+        /// statement does.
+        /// </summary>
+        public static void RaiseError(string message)
         {
-            var md = new SqlMetaData[dt.Columns.Count];
-            for (var index = 0; index < dt.Columns.Count; index++)
+            if (message.Length > MaxMessageLength)
+                message = message.Substring(0, MaxMessageLength);
+
+            using (var cnn = new SqlConnection("context connection=true"))
+            using (var command = new SqlCommand("RAISERROR(N'%s', 16, 1, @message);", cnn))
             {
-                var column = dt.Columns[index];
-                md[index] = SqlMetaDataFromColumn(column);
+                command.Parameters.Add("@message", SqlDbType.NVarChar, MaxMessageLength).Value = message;
+                cnn.Open();
+                try
+                {
+                    SqlContext.Pipe.ExecuteAndSend(command);
+                }
+                catch (SqlException)
+                {
+                    // The error has reached the caller; letting it out of .NET would add error 6522 to it
+                }
             }
-
-            return md;
         }
-
-        private static SqlMetaData SqlMetaDataFromColumn(DataColumn column)
-        {
-            SqlMetaData smd = null;
-            var clrType = column.DataType;
-            var name = column.ColumnName;
-            switch (Type.GetTypeCode(clrType))
-            {
-                case TypeCode.String:
-                    smd = new SqlMetaData(name, SqlDbType.NVarChar, column.MaxLength);
-                    break;
-                case TypeCode.Boolean: smd = new SqlMetaData(name, SqlDbType.Bit); break;
-                case TypeCode.Byte: smd = new SqlMetaData(name, SqlDbType.TinyInt); break;
-                case TypeCode.Char: smd = new SqlMetaData(name, SqlDbType.NVarChar, 1); break;
-                case TypeCode.DateTime: smd = new SqlMetaData(name, SqlDbType.DateTime); break;
-                case TypeCode.Decimal: smd = new SqlMetaData(name, SqlDbType.Decimal, 18, 0); break;
-                case TypeCode.Double: smd = new SqlMetaData(name, SqlDbType.Float); break;
-                case TypeCode.Int16: smd = new SqlMetaData(name, SqlDbType.SmallInt); break;
-                case TypeCode.Int32: smd = new SqlMetaData(name, SqlDbType.Int); break;
-                case TypeCode.Int64: smd = new SqlMetaData(name, SqlDbType.BigInt); break;
-                case TypeCode.Single: smd = new SqlMetaData(name, SqlDbType.Real); break;
-                default: throw UnknownDataType(clrType);
-            }
-
-            return smd;
-        }
-
-        private static Exception UnknownDataType(Type clrType)
-        {
-            return new ArgumentException("Unknown type: " + clrType);
-        }
-
-
-
-
     }
 }
