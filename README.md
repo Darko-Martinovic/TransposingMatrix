@@ -198,3 +198,7 @@ Setup.sql records a hash of the sources it was built from, and a test fails when
 | `TransposingMatrix/Test/Test.sql` | Examples to run in SSMS |
 | `tools/SetupScript/` | Generates Setup.sql (.NET 10) |
 | `tests/TransposingMatrix.Tests/` | xUnit tests against SQL Server in a container (.NET 10) |
+
+## License
+
+[MIT](LICENSE)
